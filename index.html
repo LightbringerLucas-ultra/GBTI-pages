@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="on-landing">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>GBTI · 股票人格与每周精选</title>
+  <meta name="description" content="28 道题，四个维度，探索你的股票人格，生成带专属场景插画的高清结果卡，并可和 AI 助手聊聊你的结果。">
+  <meta name="theme-color" content="#f7f3eb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#191815" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23c44236'/%3E%3Ctext x='7' y='24' fill='white' font-size='22' font-family='sans-serif' font-weight='700'%3EG%3C/text%3E%3C/svg%3E">
+  <script src="theme-sync.js"></script>
+  <script>
+    /* 皮肤由 theme-sync.js 同步；此处恢复答题进度。 */
+    (function () {
+      try {
+        var progress = JSON.parse(localStorage.getItem("gbti-progress-v6-20261013") || "null");
+        if (progress && Array.isArray(progress.answers) && progress.answers.length) window.__gbtiResume = progress;
+      } catch (error) { /* 无痕模式或存储被禁用时静默跳过。 */ }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="metaphysics.css">
+  <link rel="stylesheet" href="tarot.css">
+  <link rel="stylesheet" href="news.css">
+  <link rel="stylesheet" href="disclaimer.css">
+  <!-- 按依赖顺序加载。全部为普通脚本，双击 HTML 即可离线运行。 -->
+  <script src="questions.js" defer></script>
+  <script src="scoring.js" defer></script>
+  <script src="characters.js" defer></script>
+  <script src="poster.js" defer></script>
+  <script src="radar.js" defer></script>
+  <script src="pool.js" defer></script>
+  <script src="pool-index.js" defer></script>
+  <script src="market-data.js" defer></script>
+  <script src="allocation.js" defer></script>
+  <script src="plan.js" defer></script>
+  <script src="ai.js" defer></script>
+  <script src="update.js" defer></script>
+  <script src="news-engine.js" defer></script>
+  <script src="news-data.js" defer></script>
+  <script src="news.js" defer></script>
+  <script src="news-map.js" defer></script>
+  <script src="test.js" defer></script>
+  <!-- 玄学操盘适配度模块（纯新增）：lunar.js 提供黄历，metaphysics.js 提供双维画像 + 适配度 + AI 解读 -->
+  <script src="lunar.js" defer></script>
+  <script src="metaphysics.js" defer></script>
+  <!-- 塔罗映照模块（纯新增）：依赖 metaphysics.js 暴露的 GBTI_XUANXUE.readingFor 做东西合参 -->
+  <script src="tarot.js" defer></script>
+  <script src="result-pages.js" defer></script>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <a class="skip-link" href="#quiz">跳到答题区</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="GBTI 首页">GBTI<span> / 股票人格</span></a>
+      <nav class="topnav" aria-label="页面导航">
+        <a href="#personality-gallery">16 种人格</a>
+        <a href="workbench.html">筛选工作台</a>
+        <a href="history.html">历史起伏</a>
+        <button id="open-ai" class="topnav-ai" type="button">AI 助手</button>
+      </nav>
+      <div class="topbar-actions">
+        <button id="topbar-restart" class="icon-button labeled" type="button" title="重新测试">
+          <span class="vh">重新测试</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M20.2 4.2v4.2H16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="btn-label">重新测试</span>
+        </button>
+        <button id="user-open" class="icon-button labeled" type="button" title="用户登录与 AI 配置" aria-haspopup="dialog">
+          <span class="vh">用户登录</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.6" r="3.7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 20.2c0-3.6 3.2-5.8 7.2-5.8s7.2 2.2 7.2 5.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span class="btn-label" id="user-open-label">用户登录</span>
+          <span class="btn-dot" id="user-open-dot" hidden aria-hidden="true"></span>
+        </button>
+        <button id="theme-toggle" class="icon-button labeled" type="button" title="皮肤商城" aria-label="打开皮肤商城" aria-haspopup="dialog">
+          <span class="vh">打开皮肤商城，切换页面皮肤</span>
+          <span class="theme-pumpkin theme-icon" aria-hidden="true">🎃</span>
+          <span class="theme-tree theme-icon" aria-hidden="true">🎄</span>
+          <span class="theme-firecracker theme-icon" aria-hidden="true">🧨</span>
+          <span class="theme-willow theme-icon" aria-hidden="true">🌿</span>
+          <span class="theme-moon theme-icon" aria-hidden="true">🌕</span>
+          <span class="theme-nailong theme-icon" aria-hidden="true">💛</span>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0-4v2.2M12 20.3V22.5M1.5 12h2.2M20.3 12h2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M19.4 4.6l-1.6 1.6M6.2 17.8l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 14.8A8.8 8.8 0 0 1 9.2 3.6a8.8 8.8 0 1 0 11.2 11.2Z" fill="currentColor"/></svg>
+          <span class="btn-label">皮肤</span>
+        </button>
+        <button id="ai-fab-inline" class="icon-button labeled ai-icon-button" type="button" title="打开 AI 助手">
+          <span class="vh">打开 AI 助手</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 13.9 9l5.8 1.9-5.8 1.9L12 18.6 10.1 12.8 4.3 10.9 10.1 9 12 3.2Z" fill="currentColor"/></svg>
+          <span class="btn-label">AI 助手</span>
+        </button>
+      </div>
+    </div>
+    <div class="topbar-progress" role="presentation"><span id="topbar-progress-bar"></span></div>
+  </header>
+
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="回到顶部" title="回到顶部"><span aria-hidden="true">↑</span><span class="vh">回到顶部</span></button>
+
+  <main id="top" class="shell">
+    <div class="shell-main">
+
+      <section id="quiz-heading" class="intro landing-hero" aria-labelledby="landing-title">
+        <h1 id="landing-title" class="vh">找到你的投资人格</h1>
+        <img class="landing-art landing-art-day" src="assets/display/ensemble-hero.jpg" width="1672" height="941" alt="十六种股票人格角色围聚在一起" fetchpriority="high">
+        <img class="landing-art landing-art-halloween" src="assets/display/ensemble-halloween-paper.jpg" width="1672" height="941" alt="十六种股票人格的橙黑纸艺万圣节群像">
+        <img class="landing-art landing-art-christmas" src="assets/display/ensemble-christmas.jpg" width="1664" height="928" alt="十六种股票人格的圣诞雪夜群像">
+        <img class="landing-art landing-art-spring" src="assets/display/ensemble-spring.jpg" width="1664" height="928" alt="十六种股票人格的春节庙会群像">
+        <img class="landing-art landing-art-qingming" src="assets/display/ensemble-qingming.jpg" width="1664" height="928" alt="十六种股票人格的清明踏青群像">
+        <img class="landing-art landing-art-midautumn" src="assets/display/ensemble-midautumn.jpg" width="1664" height="928" alt="十六种股票人格的中秋赏月群像">
+        <img class="landing-art landing-art-nailong" src="assets/display/ensemble-nailong.jpg?v=2" width="1672" height="941" alt="十六种奶龙股票人格围聚在一起，找到你的投资人格">
+        <button class="button-primary landing-start" type="button" id="start-cta">开始测试</button>
+      </section>
+
+      <section id="quiz" class="card quiz-card" hidden aria-labelledby="question-title">
+        <div class="progress-label"><span id="progress-text"></span><span id="progress-percent"></span></div>
+        <progress id="progress" max="28" value="0" aria-label="答题进度"></progress>
+        <div class="question-top"><span id="question-dimension" class="eyebrow"></span><span id="question-number"></span></div>
+        <h2 id="question-title" tabindex="-1"></h2>
+        <div id="options" class="options" role="group" aria-labelledby="question-title"></div>
+        <div class="quiz-bottom">
+          <button id="previous" class="text-button" type="button" disabled>← 上一题</button>
+          <span class="quiz-tip">选择后自动继续，A / B 键也可作答</span>
+        </div>
+        <button id="reset-progress" class="text-button quiz-reset" type="button" hidden>清空已保存的作答记录</button>
+      </section>
+
+      <header id="section-page-header" class="section-page-header" hidden>
+        <a id="section-back" href="?view=result">← 返回测试结果</a>
+        <p class="section-kicker" id="section-page-kicker"></p>
+        <h1 id="section-page-title" tabindex="-1"></h1>
+        <p id="section-page-description" class="hint"></p>
+      </header>
+      <section id="result" aria-labelledby="result-name" hidden>
+        <article class="hero-card card">
+          <div class="hero-top">
+            <p class="hero-label">你的人格类型是</p>
+            <button id="hero-ai" class="pill-button" type="button">让 AI 解读我的结果</button>
+          </div>
+          <h1 id="result-name" tabindex="-1"></h1>
+          <p id="result-code" class="hero-code"></p>
+          <img id="character-image" class="character-image" width="1024" height="1280" alt="" hidden>
+          <p id="result-motto" class="hero-motto"></p>
+          <div id="result-tags" class="tags"></div>
+          <div class="hero-context">
+            <h2 id="profile-title">性格速写</h2>
+            <p id="result-description" class="body-copy"></p>
+            <p id="axis-summary" class="axis-summary"></p>
+          </div>
+        </article>
+
+        <article class="card reflection-card"><p class="section-kicker">给自己的提醒</p><p id="result-reflection" class="body-copy"></p></article>
+
+        <details class="fold-section fold" id="dimension-fold">
+          <summary class="fold-head">
+            <span class="fold-mark" aria-hidden="true">四维</span>
+            <span class="fold-text">
+              <span class="section-kicker">四维偏好</span>
+              <span class="fold-title" id="dimension-heading">你的选择，逐项展开</span>
+              <span class="fold-hint">信息依据、持有周期、风险偏好、决策方式，每个维度 7 题，共同决定一个主人格。</span>
+            </span>
+            <span class="fold-chev" aria-hidden="true"></span>
+          </summary>
+          <div class="fold-body">
+            <div class="radar-card card">
+              <div class="radar-wrap">
+                <canvas id="radar" width="640" height="640" role="img" aria-label="四维偏好雷达图"></canvas>
+              </div>
+              <div id="radar-caption" class="radar-caption"></div>
+            </div>
+            <div id="scores" class="dimension-list"></div>
+            <p class="hint score-note">百分比为本维度的选项占比，不是人格概率或准确率。</p>
+          </div>
+        </details>
+
+        <details id="weekly-news" class="fold-section fold news-fold" hidden aria-labelledby="weekly-news-title">
+          <summary class="fold-head">
+            <span class="fold-mark" aria-hidden="true">精选</span>
+            <span class="fold-text">
+              <span class="section-kicker">每周精选</span>
+              <span class="fold-title" id="weekly-news-title">与你的投资风格相符的资讯</span>
+              <span class="fold-hint">查看本周精选、推荐理由与原文，也可转动 3D 地球仪浏览全球资讯。</span>
+            </span>
+            <span class="fold-chev" aria-hidden="true"></span>
+          </summary>
+          <div class="fold-body">
+          <div class="weekly-news card">
+          <div class="news-masthead"><span>GBTI WEEKLY</span><span id="news-edition"></span></div>
+          <div class="news-heading-row">
+            <p class="section-kicker">为你的投资风格精选</p>
+            <span class="news-style-badge" id="news-style"></span>
+          </div>
+          <p id="news-lens" class="news-lens"></p>
+          <div class="news-focus" id="news-focus" aria-label="你的资讯关注方向"></div>
+          <div class="news-toolbar">
+            <label for="news-week">阅读刊期 <select id="news-week"></select></label>
+            <button id="news-refresh" type="button" class="pill-button">检查更新</button>
+          </div>
+          <p id="news-status" class="news-status" role="status" aria-live="polite"></p>
+          <div id="news-list" class="news-list"></div>
+          <details class="news-method">
+            <summary>这些资讯为什么推荐给我？</summary>
+            <p>根据测试中的信息依据、持有周期、风险偏好和决策方式匹配内容，再结合来源质量、发布时间和独立来源报道数量排序。同一事件合并，每期最多 6 条，并优先保留一条风险或防御视角。同一来源最多 3 条，同一主题最多 2 条，合格内容不足时少推。</p>
+            <p>资讯窗口为北京时间周一至周日，本周持续更新。仅整理已采集的公开内容；每条均可打开原文核验。风格匹配只用于阅读排序，不代表投资适当性或收益预测。</p>
+          </details>
+          <p class="news-footer" id="news-data-note"></p>
+          </div>
+          <section id="weekly-map" aria-label="金融资讯地球仪" aria-busy="true">
+            <p class="hint">进入每周精选后，可转动地球仪查看各地区资讯。</p>
+          </section>
+          </div>
+        </details>
+
+        <details id="plan" class="fold-section fold" hidden>
+          <summary class="fold-head">
+            <span class="fold-mark" aria-hidden="true">配置</span>
+            <span class="fold-text">
+              <span class="section-kicker">资产配置建议</span>
+              <span class="fold-title" id="plan-heading">按你的风格，钱可以这样分</span>
+              <span class="fold-hint" id="plan-lead"></span>
+            </span>
+            <span class="fold-chev" aria-hidden="true"></span>
+          </summary>
+          <div class="fold-body">
+            <div class="plan-actions">
+              <button id="plan-copy" class="pill-button" type="button">复制整套方案</button>
+              <button id="plan-ask" class="pill-button" type="button">问 AI 为什么这样配</button>
+              <button id="plan-reset" class="pill-button" type="button" hidden>清除我的调整</button>
+            </div>
+
+            <div class="plan-grid">
+            <article class="card plan-allocation">
+              <div class="plan-card-head">
+                <h3>四类资产比例</h3>
+                <span class="plan-tipchip">点任意一块查看</span>
+              </div>
+              <div class="plan-donut-wrap">
+                <canvas id="plan-donut" width="360" height="360" role="img" aria-label="四类资产比例环形图，点击扇区可查看对应类别"></canvas>
+                <div class="plan-donut-center" aria-hidden="true">
+                  <strong id="plan-equity">--</strong>
+                  <span id="plan-donut-label">权益类</span>
+                </div>
+              </div>
+              <ul id="plan-bars" class="plan-bars"></ul>
+              <div class="plan-tweak">
+                <p class="plan-tweak-head">
+                  <span>按自己的情况微调</span>
+                  <span class="plan-tipchip">结果会同步到长图</span>
+                </p>
+                <ul id="plan-tweaks" class="plan-tweaks"></ul>
+              </div>
+            </article>
+
+            <article class="card plan-vehicles-card">
+              <div class="plan-card-head">
+                <h3>债券、货币与黄金的载体</h3>
+                <span class="plan-tipchip">与左侧联动</span>
+              </div>
+              <ul id="plan-vehicles" class="plan-vehicles"></ul>
+            </article>
+          </div>
+
+          <article class="card plan-stocks">
+            <div class="plan-card-head">
+              <h3>与你风格相符的标的示例</h3>
+              <div class="plan-tools">
+                <div class="seg" id="plan-sort" role="group" aria-label="标的排序方式">
+                  <button class="seg-btn is-on" type="button" data-sort="score" aria-pressed="true">按匹配度</button>
+                  <button class="seg-btn" type="button" data-sort="pePct" aria-pressed="false">按估值分位</button>
+                  <button class="seg-btn" type="button" data-sort="amount" aria-pressed="false">按成交额</button>
+                </div>
+                <button id="plan-expand" class="pill-button" type="button" aria-pressed="false">展开全部理由</button>
+                <a id="plan-workbench" class="pill-button" href="workbench.html">在全池中查看</a>
+                <a id="plan-history" class="pill-button" href="history.html">看这类风格的历史起伏</a>
+              </div>
+            </div>
+            <p class="hint" id="plan-stocks-lead"></p>
+            <ol id="plan-stock-list" class="plan-stock-list"></ol>
+          </article>
+
+          <article class="card plan-discipline" id="plan-discipline">
+            <div class="plan-card-head">
+              <h3 id="plan-discipline-title"></h3>
+              <button id="plan-discipline-copy" class="pill-button" type="button">复制这份清单</button>
+            </div>
+            <ul id="plan-discipline-list"></ul>
+          </article>
+
+          <article class="card plan-risk">
+            <div class="plan-card-head">
+              <h3>风险提示</h3>
+              <button id="plan-risk-toggle" class="pill-button" type="button" aria-expanded="false" aria-controls="plan-disclaimer">展开全文</button>
+            </div>
+            <ul id="plan-disclaimer" class="plan-disclaimer is-clamped"></ul>
+            <p class="hint" id="plan-data-note"></p>
+          </article>
+          </div>
+        </details>
+
+        <details class="card rules-card"><summary>这个结果是怎么得出的？</summary><p>28 道题分别测量信息依据、持有周期、风险偏好与决策方式，每个维度 7 题。每题给一个方向加 1 分，各维度得分较高的一端组合成四位代码，唯一对应 16 种人格中的一种。“客观规则／主观判断”描述依照预设标准或结合情境判断的偏好，不代表理性程度或判断能力。名称是风格比喻，不表示实际经历、投资能力或适合的投资产品。</p></details>
+
+        <div class="save-area">
+          <button id="generate-image" class="button-primary" type="button">生成高清结果长图 ↓</button>
+          <p id="image-status" role="status" hidden>正在生成高清长图……</p>
+          <button id="retry-image" class="button-ghost" type="button" hidden>重新生成图片</button>
+          <a id="download" class="button-primary" download hidden>保存完整结果长图 <span aria-hidden="true">↓</span></a>
+          <p class="hint">点击生成后可下载或长按保存高清 PNG</p>
+          <details id="image-preview"><summary>展开图片，长按保存</summary><img id="poster-image" alt="完整结果长图" hidden></details>
+          <div class="share-row">
+            <button id="copy-result" class="button-ghost" type="button">复制结果文字</button>
+            <button id="restart" class="button-ghost" type="button">重新测试 ↗</button>
+          </div>
+          <p class="donate-line">测得开心？<button class="donate-link" type="button" data-donate-open>请作者喝杯咖啡 ☕</button></p>
+          <p id="copy-status" class="hint" role="status"></p>
+        </div>
+        <details id="data-panel" class="fold-section fold">
+          <summary class="fold-head">
+            <span class="fold-mark" aria-hidden="true">数据</span>
+            <span class="fold-text">
+              <span class="section-kicker">数据维护</span>
+              <span class="fold-title">每日行情数据更新</span>
+              <span class="fold-hint" id="data-fold-hint">正在读取本地快照……</span>
+            </span>
+            <span class="fold-chev" aria-hidden="true"></span>
+          </summary>
+          <div class="fold-body">
+            <div id="data-transport" class="data-transport" hidden></div>
+            <div class="data-status" id="data-status"></div>
+  
+            <div class="data-actions">
+              <button id="data-refresh" class="button-secondary" type="button">立即更新行情数据</button>
+              <button id="data-check" class="button-ghost" type="button">检查更新服务</button>
+            </div>
+  
+            <label class="field data-endpoint">
+              <span>更新服务地址</span>
+              <input id="data-endpoint" type="text" placeholder="例如 http://127.0.0.1:8765" autocomplete="off" spellcheck="false">
+            </label>
+            <p class="hint">留空则自动判断：网页由本机服务打开时用同一个地址，双击 HTML 打开时自动探测 http://127.0.0.1:8765，能连上按钮就直接可用。</p>
+
+            <div class="data-actions">
+              <button id="data-schedule" class="button-ghost" type="button" hidden>开启每个交易日自动更新</button>
+            </div>
+            <p class="hint" id="data-schedule-hint">开启后 Windows 会在每个工作日 17:35 自动抓取行情并写入 market-data.js，不用打开本页也会更新；再点一次即可关闭。此开关需要先连上更新服务。</p>
+
+            <div class="data-token" id="data-token-box" hidden>
+              <p class="hint" id="data-token-status"></p>
+              <div class="data-token-row">
+                <input id="data-token-input" type="password" placeholder="粘贴新的数据凭证（12 小时有效）" autocomplete="off" spellcheck="false">
+                <button id="data-token-save" class="pill-button" type="button">保存凭证</button>
+              </div>
+            </div>
+            <p class="hint data-lan" id="data-lan" hidden></p>
+  
+            <p id="data-log" class="data-log" role="status" hidden></p>
+  
+            <details class="data-help">
+              <summary>没有服务时，怎么手动更新？</summary>
+              <div class="data-help-body">
+                <p class="hint">更新按钮需要一个在后台运行的小服务，它负责调用抓取脚本。没有服务时按下面任一种方式处理，完成后刷新本页即可看到新数据。</p>
+                <p class="data-kbd-title">方式一　启动本地更新服务（推荐，双击后一步到位）</p>
+                <p class="hint">双击 <code>tools\启动更新服务.bat</code>：服务启动后会自动在浏览器里打开本页，之后「立即更新行情数据」随时可用。也可以在本文件夹下打开命令提示符或终端，手动执行：</p>
+                <div class="cmd-row"><code id="data-cmd-service">python tools/update-server.py</code><button class="pill-button data-copy" type="button" data-copy="data-cmd-service">复制</button></div>
+                <p class="data-kbd-title">方式二　只跑一次抓取脚本</p>
+                <div class="cmd-row"><code id="data-cmd-once">python tools/fetch-market-data.py</code><button class="pill-button data-copy" type="button" data-copy="data-cmd-once">复制</button></div>
+                <p class="hint">也可以双击 <code>tools\更新行情.bat</code>。脚本把结果写入 <code>market-data.js</code>，完成后刷新本页。</p>
+                <p class="data-kbd-title">方式三　每个交易日自动更新</p>
+                <p class="hint">连上服务后直接点上面的「开启每个交易日自动更新」即可，无需手动配置任务计划。手动配置步骤与接收方准备清单见随文件夹一起提供的 <code>数据更新说明.md</code>。</p>
+              </div>
+            </details>
+          </div>
+        </details>
+      </section>
+
+      <details id="personality-gallery" class="gallery-section">
+        <summary>认识全部 16 种股票人格 <span aria-hidden="true">＋</span></summary>
+        <div id="gallery" class="gallery"></div>
+      </details>
+
+      <noscript><p class="card">请启用 JavaScript 后进行测试。</p></noscript>
+
+      <footer>
+        <p>GBTI V10 · 趣味自我探索 · 非科学测评 · 不构成投资建议</p>
+        <p>答题进度保存在浏览器里，随时可清空；使用第三方 AI 服务会发送相关上下文。</p>
+        <p><a href="workbench.html">标的筛选工作台</a> · <a href="history.html">历史起伏</a></p>
+        <button id="donate-open" class="donate-btn" type="button" data-donate-open>☕ 打赏作者</button>
+      </footer>
+
+      <div id="donate-modal" class="donate-modal" hidden>
+        <div class="donate-backdrop" data-donate-close></div>
+        <div class="donate-card" role="dialog" aria-modal="true" aria-label="打赏作者">
+          <img src="assets/donate-qr.jpg" alt="微信打赏二维码">
+          <p class="donate-text">如果这个测试给你带来了快乐，<br>欢迎请作者喝杯咖啡 ☕</p>
+          <button class="donate-close" type="button" data-donate-close>关闭</button>
+        </div>
+      </div>
+      <script>
+      (function () {
+        var modal = document.getElementById("donate-modal");
+        if (!modal) return;
+        function show(value) { modal.hidden = !value; document.body.style.overflow = value ? "hidden" : ""; }
+        document.querySelectorAll("[data-donate-open]").forEach(function (el) {
+          el.addEventListener("click", function () { show(true); });
+        });
+        modal.querySelectorAll("[data-donate-close]").forEach(function (el) {
+          el.addEventListener("click", function () { show(false); });
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && !modal.hidden) show(false);
+        });
+      })();
+      </script>
+    </div>
+
+    <aside class="shell-side" hidden aria-label="答题辅助">
+      <div class="card side-card">
+        <p class="section-kicker">答题进度</p>
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 120 120" role="img" aria-label="答题完成度">
+            <circle class="ring-track" cx="60" cy="60" r="50"></circle>
+            <circle id="ring-progress" class="ring-value" cx="60" cy="60" r="50"></circle>
+          </svg>
+          <div class="ring-text"><strong id="ring-percent">0%</strong><span id="ring-label">0 / 28</span></div>
+        </div>
+        <p class="hint side-hint">答题记录会自动保存在本地，关闭页面后再打开可继续。</p>
+      </div>
+
+      <div class="card side-card" id="navigator-card">
+        <p class="section-kicker">答题卡</p>
+        <div id="navigator" class="navigator" role="group" aria-label="题目跳转"></div>
+        <p class="hint side-hint" id="navigator-hint">灰色为未作答，点数字即可跳题修改。</p>
+      </div>
+
+      <div class="card side-card ai-side-card">
+        <p class="section-kicker">AI 助手</p>
+        <h3>对结果有疑问？</h3>
+        <p class="hint side-hint">可以直接问「我为什么是这个类型」「稳健和进取差在哪」「给我三条提醒」。</p>
+        <button id="side-ai" class="button-secondary" type="button">打开 AI 助手</button>
+      </div>
+    </aside>
+  </main>
+
+  <button id="ai-fab" class="ai-fab" type="button" aria-controls="ai-panel" aria-expanded="false">
+    <span class="ai-fab-orb" aria-hidden="true"></span>
+    <span class="ai-fab-text">AI 助手</span>
+  </button>
+
+  <aside id="ai-panel" class="ai-panel" role="dialog" aria-modal="false" aria-labelledby="ai-title" hidden>
+    <div id="ai-resize-handle" class="ai-resize-handle" title="拖拽调整面板大小" aria-hidden="true"></div>
+    <header class="ai-head">
+      <div class="ai-head-id">
+        <span class="ai-orb" aria-hidden="true"></span>
+        <div>
+          <h2 id="ai-title">GBTI 智能助手</h2>
+          <p id="ai-subtitle">尚未测试，可先了解题型与维度</p>
+        </div>
+      </div>
+      <div class="ai-head-actions">
+        <span id="ai-engine" class="ai-engine-chip">本地引擎</span>
+        <button id="ai-max" class="icon-button" type="button" title="放大面板">
+          <span class="vh">放大或还原面板</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="ai-settings-open" class="icon-button" type="button" title="用户中心与 AI 配置">
+          <span class="vh">用户中心与 AI 配置</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.7 7.7 0 0 0-2.6-1.5L14 2.6h-4l-.5 2.4a7.7 7.7 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.7 7.7 0 0 0 2.6 1.5l.5 2.4h4l.5-2.4a7.7 7.7 0 0 0 2.6-1.5l2.3.9 2-3.4-2-1.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="ai-clear" class="icon-button" type="button" title="清空对话">
+          <span class="vh">清空对话</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="ai-close" class="icon-button" type="button" title="收起">
+          <span class="vh">收起 AI 助手</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </header>
+    <div id="ai-messages" class="ai-messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+    <details id="ai-qa" class="ai-qa">
+      <summary>可以问我这些（点击直接提问）</summary>
+      <div id="ai-qa-list" class="ai-qa-list"></div>
+    </details>
+    <div id="ai-chips" class="ai-chips"></div>
+    <form id="ai-form" class="ai-form">
+      <label class="vh" for="ai-input">输入你的问题</label>
+      <textarea id="ai-input" rows="1" placeholder="例如：帮我解读一下我的结果"></textarea>
+      <button id="ai-send" class="button-primary ai-send" type="submit">发送</button>
+    </form>
+    <p class="ai-foot">回答由本地规则引擎生成，仅供自我探索参考，不构成投资建议。</p>
+  </aside>
+
+  <dialog id="ai-settings" class="modal">
+    <form method="dialog" class="modal-body">
+      <header class="modal-head"><h2>用户中心</h2><button class="icon-button" value="close" title="关闭">✕</button></header>
+      <p class="hint">这个页面没有服务器，也没有账号体系。这里的「登录」只是在你自己这台设备的浏览器里存一份本地档案，用来区分不同使用者各自的 AI 配置。不会上传到任何地方，清除浏览器数据就会消失。</p>
+
+      <label class="field"><span>昵称（可选）</span><input id="user-name" type="text" maxlength="16" placeholder="例如 小王" autocomplete="off"></label>
+      <p class="hint">填写后会显示在右上角入口上，方便区分这是谁的配置。</p>
+
+      <section class="user-section" aria-labelledby="ai-config-title">
+        <h3 id="ai-config-title" class="user-section-title">AI 配置</h3>
+        <p class="hint">默认使用内置本地引擎，离线可用、无需任何配置。填写下面的信息后可切换到真实大模型。</p>
+        <div class="ai-preset">
+          <span class="ai-preset-label">一键填入</span>
+          <button class="pill-button" type="button" data-preset="deepseek">DeepSeek</button>
+          <button class="pill-button" type="button" data-preset="clear">清空三项</button>
+        </div>
+        <label class="field"><span>服务地址 Base URL</span><input id="ai-base" type="text" placeholder="例如 https://api.deepseek.com" autocomplete="off"></label>
+        <label class="field"><span>API Key</span><input id="ai-key" type="password" placeholder="仅保存在当前浏览器，不会上传到本站服务器" autocomplete="off"></label>
+        <label class="field"><span>模型名称</span><input id="ai-model" type="text" placeholder="例如 deepseek-v4-flash" autocomplete="off"></label>
+        <label class="field field-check"><input id="ai-strict" type="checkbox"><span>严格模式：只回答测试相关的问题（更省 token，适合把页面发给朋友玩时开启）</span></label>
+        <p class="hint">用的是 OpenAI 兼容格式。除 DeepSeek 外，任何兼容该格式的服务都可以：服务地址填其 Base URL，模型名按其文档填。</p>
+        <p class="hint warn">密钥保存在浏览器本地存储中。公共电脑上不建议填写，用完请点下方清除。若接口不可用，助手会自动回退到本地引擎。</p>
+        <p class="hint" id="user-engine-note"></p>
+      </section>
+
+      <div class="modal-actions">
+        <button id="ai-save" class="button-primary" value="save" type="button">保存并启用</button>
+        <button id="ai-reset" class="button-ghost" value="reset" type="button">清除配置，回到本地引擎</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="personality-modal" class="modal">
+    <div class="modal-body">
+      <header class="modal-head"><h2 id="pm-title">人格详情</h2><button class="icon-button" id="pm-close" type="button" title="关闭">✕</button></header>
+      <div id="pm-body"></div>
+    </div>
+  </dialog>
+
+  <dialog id="skin-dialog" class="modal">
+    <div class="modal-body">
+      <header class="modal-head"><h2>皮肤商城</h2><button class="icon-button" id="skin-close" type="button" title="关闭">✕</button></header>
+      <p class="hint" style="margin:0 0 14px">换一套皮肤，页面氛围、配色与人格画像都会跟着变。</p>
+      <div id="skin-grid" class="skin-grid"></div>
+    </div>
+  </dialog>
+  <!-- 进入主界面时的强制知情确认：只有点「我已认真阅读」才能关闭 -->
+  <dialog id="disclaimer-dialog" class="modal disclaimer-modal"
+          aria-labelledby="disclaimer-title" aria-describedby="disclaimer-desc">
+    <div class="modal-body disclaimer-body">
+      <header class="modal-head disclaimer-head">
+        <span class="disclaimer-badge" aria-hidden="true">!</span>
+        <div>
+          <h2 id="disclaimer-title">重要提示与免责声明</h2>
+          <p class="disclaimer-kicker">进入前请先完整阅读以下内容</p>
+        </div>
+      </header>
+
+      <div class="disclaimer-scroll" id="disclaimer-desc" tabindex="0">
+        <section class="disclaimer-section">
+          <h3>重大提示</h3>
+          <ol class="disclaimer-list">
+            <li>本测试是趣味自我探索工具，不是科学心理测评，也不是投资者适当性评估。28 道题与 16 种人格结果不能作为任何投资决定的依据。</li>
+            <li>结果页出现的行业与标的、风格配置结构、筛选工作台的全池数据与筛选分，全部是公开数据整理与规则示例，不构成对任何证券的推荐、要约或买卖时机判断。</li>
+            <li>历史起伏展示的是公开指数自身的波动与回撤，不是任何人格、任何组合或任何人的实际收益；玄学模块属于传统文化娱乐内容，不预测行情。</li>
+            <li>AI 助手的回答由本地规则或第三方模型生成，可能不准确；请勿输入身份证号、账户、持仓等敏感信息。</li>
+            <li>页面使用的行情与资讯均为历史快照，非实时数据，可能陈旧，请以交易所及官方披露为准。</li>
+          </ol>
+        </section>
+
+        <section class="disclaimer-section">
+          <h3>免责声明</h3>
+          <ul class="disclaimer-list">
+            <li>本站不提供投资建议，不代客理财，不承诺收益，不展示收益率排行，也不做推荐标的涨跌复盘。</li>
+            <li>答案、答题进度、收藏与皮肤偏好只保存在你自己的浏览器里，清除浏览器数据后即会消失。</li>
+            <li>答题进度保存在本地。使用第三方 AI 服务时，相关提问和测试结果上下文会发送至你选择的服务提供方。</li>
+            <li>所有内容仅供信息整理与投资者教育，请结合自身资金状况与风险承受能力独立判断，必要时咨询持牌专业机构。</li>
+          </ul>
+        </section>
+
+        <p class="disclaimer-emphasis">点击「我已认真阅读」，即表示你已理解并同意上述全部内容，并自愿继续使用本页。</p>
+      </div>
+
+      <footer class="disclaimer-foot">
+        <p class="disclaimer-hint">为保障知情权，本提示无法通过 ESC、点击空白处或关闭按钮跳过。</p>
+        <button id="disclaimer-accept" class="disclaimer-accept" type="button">我已认真阅读</button>
+      </footer>
+    </div>
+  </dialog>
+  <script src="disclaimer.js"></script>
+</body>
+</html>

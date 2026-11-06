@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN" data-section="news">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>GBTI · 金融资讯地球仪</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f7f3ed;color:#2d2b28;font:14px/1.7 "Microsoft YaHei",system-ui,sans-serif}
+    header{max-width:1512px;margin:auto;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    a{color:#c44736;text-decoration:none}.brand{font-size:25px;font-weight:800;letter-spacing:.05em}.brand span{font-size:12px;font-weight:400;color:#817a72;margin-left:10px;letter-spacing:0}
+    .back{font-size:12px}main{max-width:1512px;margin:auto;padding:0 24px 28px}#weekly-map{min-height:200px}.loading{padding:24px;border:1px solid #e6ded3;border-radius:14px;background:#fffdfa}
+    @media(max-width:600px){header{padding:16px}.brand{font-size:23px}.brand span{font-size:11px}main{padding:0 8px 18px}.back{font-size:11px}}
+  </style>
+</head>
+<body>
+  <header><a class="brand" href="index.html">GBTI<span>全球资讯</span></a><a class="back" href="index.html?section=news">返回每周精选 →</a></header>
+  <main>
+    <details id="weekly-news" open>
+      <summary hidden>金融资讯地球仪</summary>
+      <div id="weekly-map" aria-busy="true"><p class="loading">正在载入资讯地球仪…</p><noscript>请在浏览器中启用 JavaScript。</noscript></div>
+    </details>
+  </main>
+  <script src="news-map.js"></script>
+</body>
+</html>

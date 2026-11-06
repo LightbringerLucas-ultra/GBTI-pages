@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3eb">
+  <title>GBTI 标的筛选工作台</title>
+  <script src="theme-sync.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="subpage.css">
+  <link rel="stylesheet" href="workbench.css">
+  <script src="questions.js" defer></script>
+  <script src="scoring.js" defer></script>
+  <script src="pool.js" defer></script>
+  <script src="pool-index.js" defer></script>
+  <script src="market-data.js" defer></script>
+  <script src="allocation.js" defer></script>
+  <script src="workbench.js" defer></script>
+</head>
+<body>
+  <div class="sp-shell">
+
+    <header class="sp-topbar">
+      <a class="sp-brand" href="index.html"><span class="sp-brand-mark">G</span><span class="sp-brand-name">GBTI V10</span></a>
+      <nav class="sp-nav" aria-label="页面导航">
+        <a href="index.html">人格测试</a>
+        <a href="workbench.html" class="is-current">筛选工作台</a>
+        <a href="history.html">历史起伏</a>
+      </nav>
+      <div class="sp-skin" data-theme-picker aria-label="页面皮肤"></div>
+    </header>
+
+    <section class="sp-hero">
+      <p class="sp-eyebrow">DATA WORKBENCH</p>
+      <h1>标的筛选工作台</h1>
+      <p class="sp-sub">公开行情全池自己查，人格只决定筛选分与呈现顺序，不构成投资建议</p>
+      <div class="sp-hero-meta">
+        <span class="sp-chip">全池标的 <b>408 只</b></span>
+        <span class="sp-chip">行情截至 <b id="wb-asof">--</b></span>
+        <span class="sp-chip">估值分位 <b>本次快照无</b></span>
+      </div>
+    </section>
+
+    <p class="sp-strip">
+      <span>筛选规则、数据构成与来源</span><a href="#wb-disclosure">查看完整公示 ↓</a>
+      <span class="sp-strip-spacer"></span>
+      <span>公开数据整理 · 教学示例 · 不构成投资建议</span>
+    </p>
+
+    <section id="wb-persona" class="sp-card sp-accent wb-persona" aria-label="人格视图">
+      <div class="wb-persona-main">
+        <div>
+          <div id="wb-persona-title" class="wb-persona-title"></div>
+          <div id="wb-persona-bars" class="wb-persona-bars"></div>
+        </div>
+      </div>
+      <div class="wb-persona-actions">
+        <label class="sp-field wb-persona-switch"><span>换个人格看看</span><select id="wb-code" class="sp-select"></select></label>
+        <button id="wb-style-filter" class="sp-btn wb-btn" type="button">按我的风格筛一遍</button>
+        <button id="wb-persona-clear" class="sp-btn sp-btn-ghost wb-btn" type="button">清除人格视图</button>
+      </div>
+      <p id="wb-persona-note" class="sp-note wb-persona-note"></p>
+    </section>
+
+    <section id="wb-insight" class="sp-card wb-insight" hidden aria-label="风格分布"></section>
+
+    <section class="sp-card" aria-label="筛选条件">
+      <div class="sp-card-head"><h2>筛选条件</h2><span>条件只做前置过滤，人格打分仍是主排序</span></div>
+      <div class="wb-filter-grid">
+        <label class="sp-field wb-field"><span>关键词</span><input id="wb-search" type="search" placeholder="代码或名称" autocomplete="off"></label>
+        <label class="sp-field wb-field"><span>标的来源</span><select id="wb-group"></select></label>
+        <label class="sp-field wb-field"><span>指数成分</span><select id="wb-index"></select></label>
+        <label class="sp-field wb-field"><span>风格标签</span><select id="wb-style"></select></label>
+        <label class="sp-field wb-field"><span>市盈率下限（倍）</span><input id="wb-pe-min" type="number" min="0" step="1" placeholder="不限"></label>
+        <label class="sp-field wb-field"><span>市盈率上限（倍）</span><input id="wb-pe-max" type="number" min="0" step="1" placeholder="不限"></label>
+        <label class="sp-field wb-field"><span>总市值下限（亿元）</span><input id="wb-mcap-min" type="number" min="0" step="100" placeholder="不限"></label>
+        <label class="sp-field wb-field"><span>成交额下限（亿元）</span><input id="wb-amount-min" type="number" min="0" step="1" placeholder="不限"></label>
+        <label class="sp-field wb-field"><span>换手率下限（%）</span><input id="wb-turnover-min" type="number" min="0" step="0.1" placeholder="不限"></label>
+        <label class="sp-field wb-field"><span>换手率上限（%）</span><input id="wb-turnover-max" type="number" min="0" step="0.1" placeholder="不限"></label>
+        <label class="sp-field wb-field"><span>当日涨跌</span><select id="wb-chg"></select></label>
+        <label class="sp-field sp-check wb-field wb-check"><input id="wb-fav-only" type="checkbox"><span>只看已收藏</span></label>
+      </div>
+      <p class="sp-note">市盈率条件只对正值的市盈率生效，亏损与无数据的标的不参与该条件；指数成分股的风格由当日行情指标推导，阈值见 allocation.js。</p>
+    </section>
+
+    <section class="sp-card" aria-label="筛选结果">
+      <div class="wb-toolbar">
+        <span id="wb-count" class="wb-count" role="status" aria-live="polite"></span>
+        <div class="wb-toolbar-actions">
+          <button id="wb-export" class="sp-btn wb-btn" type="button">导出当前结果 CSV</button>
+          <button id="wb-reset" class="sp-btn sp-btn-ghost wb-btn" type="button">清空条件</button>
+        </div>
+      </div>
+      <p class="sp-note">点表头可排序，再次点击切换升降。勾选行首方框可加入对比，最多 3 只；星标收藏保存在本机浏览器。</p>
+      <div class="sp-table-wrap wb-table-wrap">
+        <table id="wb-table" class="sp-table wb-table">
+          <thead><tr id="wb-head-row"></tr></thead>
+          <tbody id="wb-body"></tbody>
+        </table>
+      </div>
+      <p id="wb-empty" class="sp-note wb-empty" hidden>当前条件下没有符合条件的标的。放宽数值条件或清空条件即可。</p>
+    </section>
+
+    <section id="wb-compare" class="sp-card wb-compare" hidden aria-label="标的对比">
+      <h2>已选对比</h2>
+      <div id="wb-compare-body"></div>
+    </section>
+
+    <section class="sp-disclosure" id="wb-disclosure" aria-label="筛选逻辑公示">
+      <details>
+        <summary>筛选逻辑公示<span class="sp-summary-hint">展开查看数据构成、算法权重、来源与免责</span></summary>
+        <div class="sp-disclosure-body" id="wb-notice-body"><p>正在读取本地行情快照……</p></div>
+      </details>
+    </section>
+
+    <footer class="sp-foot">
+      <p>本页仅作公开数据整理与信息展示，不构成投资建议，也不构成对任何证券的推荐或要约。本页不包含交易时机判断，不承诺收益，不代客理财。</p>
+      <p>请结合自身资金状况与风险承受能力独立判断，必要时咨询持牌专业机构。答案与收藏只保存在你自己的浏览器里。</p>
+    </footer>
+  </div>
+</body>
+</html>

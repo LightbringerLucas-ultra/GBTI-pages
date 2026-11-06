@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3eb">
+  <title>GBTI 历史起伏</title>
+  <script src="theme-sync.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="subpage.css">
+  <link rel="stylesheet" href="history.css">
+  <script src="questions.js" defer></script>
+  <script src="scoring.js" defer></script>
+  <script src="allocation.js" defer></script>
+  <script src="index-history.js" defer></script>
+  <script src="history.js" defer></script>
+</head>
+<body>
+  <div class="sp-shell">
+
+    <header class="sp-topbar">
+      <a class="sp-brand" href="index.html"><span class="sp-brand-mark">G</span><span class="sp-brand-name">GBTI V10</span></a>
+      <nav class="sp-nav" aria-label="页面导航">
+        <a href="index.html">人格测试</a>
+        <a href="workbench.html">筛选工作台</a>
+        <a href="history.html" class="is-current">历史起伏</a>
+      </nav>
+      <div class="sp-skin" data-theme-picker aria-label="页面皮肤"></div>
+    </header>
+
+    <section class="sp-hero">
+      <p class="sp-eyebrow">HISTORY &amp; VOLATILITY</p>
+      <h1>历史起伏</h1>
+      <p class="sp-sub">公开指数的波动与回撤，只描述过程，不展示收益</p>
+      <div class="sp-hero-meta">
+        <span class="sp-chip">行情截至 <b id="hs-asof">--</b></span>
+        <span class="sp-chip">公开指数 <b>6 条</b></span>
+        <span class="sp-chip">日线覆盖 <b>近 5 年</b></span>
+      </div>
+    </section>
+
+    <p class="sp-strip">
+      <span>风格代理关系由产品规则设定，未经实证检验</span><a href="#hs-disclosure">查看数据口径与公示 ↓</a>
+      <span class="sp-strip-spacer"></span>
+      <span>教学用途 · 不构成投资建议</span>
+    </p>
+
+    <section class="sp-card hs-persona" aria-label="人格视图">
+      <div id="hs-persona-title" class="hs-persona-title"></div>
+      <div id="hs-persona-bars" class="hs-persona-bars"></div>
+      <div class="hs-persona-actions">
+        <label class="sp-field hs-switch"><span>换个人格看看</span><select id="hs-code" class="sp-select"></select></label>
+        <span id="hs-persona-note" class="sp-note hs-persona-note"></span>
+      </div>
+    </section>
+
+    <section class="sp-card hs-controls" aria-label="观察窗口">
+      <div class="hs-ranges" id="hs-ranges" role="group" aria-label="观察窗口">
+        <button type="button" data-years="1">近 1 年</button>
+        <button type="button" data-years="3">近 3 年</button>
+        <button type="button" data-years="5">近 5 年</button>
+      </div>
+      <label class="sp-check hs-check"><input id="hs-all-styles" type="checkbox"><span>同时显示 4 种风格</span></label>
+      <span id="hs-window-note" class="sp-note hs-window-note"></span>
+    </section>
+
+    <section class="sp-card hs-chart" aria-label="历史回撤曲线">
+      <div class="sp-card-head">
+        <h2>区间回撤曲线</h2>
+        <span>纵轴是相对区间内最高点的回撤，越往下代表回落越深</span>
+      </div>
+      <div id="hs-canvas-wrap" class="hs-canvas-wrap">
+        <canvas id="hs-canvas" width="1080" height="400" tabindex="0" role="img"
+                aria-label="公开指数区间回撤曲线，可用左右方向键查看任一交易日读数"></canvas>
+        <div id="hs-tip" class="hs-tip" hidden></div>
+      </div>
+      <p class="sp-note">移动鼠标或用左右方向键查看任一交易日读数，点击可锁定十字线，再次点击解除。读数框显示当日公开指数点位、当日变动与距区间高点的回撤，不是任何人格或组合的收益。</p>
+      <div id="hs-legend" class="hs-legend"></div>
+    </section>
+
+    <section class="sp-card hs-stats" aria-label="波动指标">
+      <h2>区间波动指标</h2>
+      <div class="sp-table-wrap">
+        <table id="hs-stats" class="sp-table hs-stats-table">
+          <thead><tr>
+            <th>公开指数</th><th>最大回撤 %</th><th>年化波动率 %</th>
+            <th>区间振幅 %</th><th>下跌交易日占比 %</th>
+          </tr></thead>
+          <tbody id="hs-stats-body"></tbody>
+        </table>
+      </div>
+      <p class="sp-note">指标全部由上面的日线收盘价当场计算。年化波动率按相邻收盘价变动幅度的标准差乘 252 个交易日的平方根；下跌交易日占比按相邻收盘价下降的天数统计。本页不展示累计收益率，也不做收益排名。</p>
+    </section>
+
+    <section class="sp-disclosure" id="hs-disclosure" aria-label="数据口径与公示">
+      <details>
+        <summary>数据口径与公示<span class="sp-summary-hint">展开查看代理规则、来源、复权口径与免责</span></summary>
+        <div class="sp-disclosure-body" id="hs-notice-body"><p>正在读取本地指数快照……</p></div>
+      </details>
+    </section>
+
+    <footer class="sp-foot">
+      <p>本页仅作公开数据整理与投资者教育，不构成投资建议，也不构成对任何证券的推荐或要约。本页不包含交易时机判断，不承诺收益，不代客理财。</p>
+      <p>请结合自身资金状况与风险承受能力独立判断，必要时咨询持牌专业机构。</p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "sources": [
+    { "id": "tushare", "name": "Tushare 新闻通讯", "kind": "tushare", "tier": "media", "enabled": true },
+    { "id": "nbs", "name": "国家统计局", "kind": "official_nbs", "tier": "official", "url": "https://www.stats.gov.cn/sj/zxfb/", "enabled": true },
+    { "id": "chinanews", "name": "中国新闻网", "kind": "rss", "tier": "established", "url": "https://www.chinanews.com.cn/rss/finance.xml", "enabled": true },
+    { "id": "wallstreetcn", "name": "华尔街见闻", "kind": "wallstreetcn", "tier": "media", "url": "https://api-one.wallstcn.com/apiv1/content/lives", "enabled": true }
+  ]
+}
