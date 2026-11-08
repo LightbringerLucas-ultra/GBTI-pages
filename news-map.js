@@ -641,7 +641,7 @@ function createNewsGlobe($, regions, topology, callbacks) {
 }
 
 // Single-palm XY movement rotates; wrist/MCP size controls relative zoom.
-// A deliberate two-hand sequence is reserved for the undisclosed easter egg.
+// A one-second fist hold followed by an open palm triggers the hidden effect.
 function createGlobeHandGesture() {
   'use strict';
   let lastTime = 0, normal = null, egg = null, cooldownUntil = 0;
@@ -668,33 +668,30 @@ function createGlobeHandGesture() {
       clipped: points.some(p => p.x < 0 || p.x > 1 || p.y < 0 || p.y > 1)
     };
   }
-  function updateEgg(hands, time) {
-    // Two fists held for 1.2 s, then both palms opened within 2.5 s. One-hand
-    // stopping/regripping and ordinary depth movements never arm this sequence.
-    const ordered = [...hands].sort((a, b) => a.x - b.x);
-    const closed = ordered.every(hand => hand.pose === 'fist');
-    if (time < cooldownUntil) { egg = null; return quiet('multiple'); }
-    if (egg && ordered.some((hand, i) => Math.hypot(hand.x - egg.origin[i].x, hand.y - egg.origin[i].y) > .13)) egg = null;
-    if (!egg) {
-      if (!closed) return quiet('multiple');
-      egg = {origin: ordered, since: time, samples: 0, armedAt: 0, openingAt: null, openSamples: 0, expired: false};
+  function updateEgg(hand, id, time) {
+    if (time < cooldownUntil) { egg = null; return null; }
+    if (egg && (egg.id !== id || Math.hypot(hand.x - egg.x, hand.y - egg.y) > .14)) egg = null;
+    if (hand.pose === 'fist') {
+      normal = null;
+      if (!egg) egg = {id, x: hand.x, y: hand.y, since: time, samples: 0, armed: false, releasingAt: null, openingAt: null, openSamples: 0};
+      egg.samples++;
+      if (time - egg.since >= 1000 && egg.samples >= 4) egg.armed = true;
+      egg.releasingAt = egg.openingAt = null; egg.openSamples = 0;
+      return quiet('stopped');
     }
-    if (egg.expired) { if (!closed) egg = null; return quiet('multiple'); }
-    if (egg.armedAt) {
-      if (time - egg.armedAt > 2500) { egg.expired = true; return quiet('multiple'); }
-      if (ordered.every(hand => hand.pose === 'open')) {
-        egg.openingAt ??= time; egg.openSamples++;
-        if (time - egg.openingAt >= 160 && egg.openSamples >= 3) {
-          reset(); cooldownUntil = time + 8200;
-          return {...quiet('burst'), burst: true};
-        }
-      } else { egg.openingAt = null; egg.openSamples = 0; }
-      return quiet('multiple');
-    }
-    if (!closed) { egg = null; return quiet('multiple'); }
-    egg.samples++;
-    if (time - egg.since >= 1200 && egg.samples >= 5) egg.armedAt = time;
-    return quiet('multiple');
+    if (!egg?.armed) { egg = null; return null; }
+    // Allow fingers to pass through a partially open pose, while ordinary
+    // rotation/zoom stays stopped. Holding the fist longer remains valid.
+    normal = null; egg.releasingAt ??= time;
+    if (time - egg.releasingAt > 1500) { egg = null; return null; }
+    if (hand.pose === 'open') {
+      egg.openingAt ??= time; egg.openSamples++;
+      if (time - egg.openingAt >= 160 && egg.openSamples >= 3) {
+        reset(); cooldownUntil = time + 8200;
+        return {...quiet('burst'), burst: true};
+      }
+    } else { egg.openingAt = null; egg.openSamples = 0; }
+    return quiet('stopped');
   }
   function updateNormal(hand, id, time, elapsed) {
     if (hand.pose !== 'open') { normal = null; return quiet('stopped'); }
@@ -744,9 +741,9 @@ function createGlobeHandGesture() {
     // only an actual long gap forces a new baseline.
     if (elapsed <= 0 || elapsed > 750) reset();
     lastTime = time;
-    if (hands.length === 2) { normal = null; return updateEgg(hands, time); }
-    egg = null;
-    return updateNormal(hands[0], handedness?.[0]?.[0]?.categoryName || '', time, elapsed);
+    if (hands.length === 2) return idle('multiple');
+    const id = handedness?.[0]?.[0]?.categoryName || '';
+    return updateEgg(hands[0], id, time) || updateNormal(hands[0], id, time, elapsed);
   }
   return {update, reset};
 }
