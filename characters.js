@@ -27,7 +27,7 @@ const characterImages = {
     "spring": "assets/display/spring/DIVE.webp",
     "qingming": "assets/display/qingming/DIVE.webp",
     "midautumn": "assets/display/midautumn/DIVE.webp",
-    "nailong": "assets/display/nailong/DIVE.jpg",
+    "nailong": "assets/display/nailong/DIVE.png",
     "original": "assets/original/DIVE.png"
   },
   "DIVI": {
