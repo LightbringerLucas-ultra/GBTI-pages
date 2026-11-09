@@ -688,7 +688,7 @@ function createNewsGlobe($, regions, topology, callbacks) {
   const focusLine = focusGuide.append('path').attr('class', 'country-card-connector');
   const focusRing = focusGuide.append('circle').attr('class', 'country-focus-ring').attr('r', 23);
   const focusDot = focusGuide.append('circle').attr('class', 'country-focus-dot').attr('r', 3);
-  const skins = createGlobeSkins($, countries, () => { burst.cancel(); gestureTarget = null; stage.dispatchEvent(new Event('globe-manual-input')); schedule(); });
+  const skins = createGlobeSkins($, countries, () => { burst.cancel(); gestureTarget = null; stage.dispatchEvent(new Event('globe-style-change')); schedule(); });
   const burst = createGlobeBurst($, () => ({width, height, cx: projection.translate()[0], cy: projection.translate()[1], radius: projection.scale(), countries: countryPaths.nodes(), surface: skins.surface(), style: skins.style()}));
 
   function schedule() { if (!frameId && visible && !document.hidden) frameId = requestAnimationFrame(frame); }
@@ -1321,7 +1321,7 @@ function createGlobeHandControls($, globe) {
           stage.scrollIntoView({block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
           nextFrame();
         } else if (data.type === 'result') {
-          if (!paused && !cameraWarnings[cameraState] && performance.now() >= manualUntil) {
+          if (!paused && !cameraWarnings[cameraState] && data.time >= manualUntil) {
             drawHands(data.landmarks);
             const action = gesture.update(data.landmarks, data.handedness, data.time, (video.videoWidth || 640) / (video.videoHeight || 480));
             status(labels[action.mode], action.mode);
@@ -1348,6 +1348,13 @@ function createGlobeHandControls($, globe) {
     else pause();
   };
   stage.addEventListener('globe-manual-input', () => pause('已切换到鼠标 / 触屏操作；点击“继续手势”恢复。'));
+  stage.addEventListener('globe-style-change', () => {
+    if (phase !== 'on' || paused) return;
+    // Keep the camera and tracking session alive; discard pre-switch results
+    // and establish a fresh palm position/depth before applying movement.
+    manualUntil = performance.now() + 250; gesture.reset(); globe.stopGesture();
+    context.clearRect(0, 0, canvas.width, canvas.height); status(labels.steady, 'steady');
+  });
   [$('#detail-dialog'), $('#credits-dialog')].forEach(dialog => new MutationObserver(() => { if (dialog.open) pause('阅读资讯时已暂停手势；关闭详情后可继续。'); }).observe(dialog, {attributes:true,attributeFilter:['open']}));
   document.addEventListener('visibilitychange', () => { if (document.hidden && phase !== 'off') stop('已离开当前标签页，摄像头自动关闭。'); });
   window.addEventListener('pagehide', () => stop());
