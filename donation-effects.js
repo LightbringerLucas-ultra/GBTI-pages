@@ -11,6 +11,7 @@
   let host = null, root = null, canvas = null, paint = null, current = null, raf = 0;
   let width = 0, height = 0, particles = [], stars = [], started = 0;
   let soundPlayed = false, stream = null, connection = 'not-configured';
+  let pollTimer=0, pollAbort=null, generation=0, reconnect=null;
   const queue = [], seen = new Map();
   try {
     soundOn = localStorage.getItem('gbti_donation_sound_v1') !== 'off';
@@ -257,19 +258,44 @@
     unlock().then(()=>{playSound();updateSoundButton();});
     finish(false);show({id:'preview-'+Date.now(),amountCents,tier,occurredAt:Date.now(),preview:true});return true;
   }
-  function disconnect() { if(stream)stream.close();stream=null;connection='disconnected';dispatch('connection',{state:connection}); }
+  function disconnect() { generation++;clearTimeout(pollTimer);if(pollAbort)pollAbort.abort();pollAbort=null;if(stream)stream.close();stream=null;reconnect=null;connection='disconnected';dispatch('connection',{state:connection}); }
   function connect(endpoint) {
     disconnect();let url;try{url=new URL(endpoint,location.href);}catch(_){return false;}
     const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(url.hostname);
     if(url.protocol!=='https:'&&!(url.protocol==='http:'&&local))return false;
     if(!window.EventSource)return false;
+    reconnect={kind:'sse',endpoint};
     stream=new EventSource(url.href);connection='connecting';
     stream.addEventListener('open',()=>{connection='connected';dispatch('connection',{state:connection});});
     stream.addEventListener('error',()=>{connection='reconnecting';dispatch('connection',{state:connection});});
     stream.addEventListener('receipt',event=>{try{receive(JSON.parse(event.data));}catch(_){}});
     return true;
   }
-  window.GBTI_DONATIONS=Object.freeze({receive,preview,connect,disconnect,setSound,unlock,
+  function connectPolling(endpoint) {
+    disconnect();let url;try{url=new URL(endpoint,location.href);}catch(_){return false;}
+    const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(url.hostname);
+    if(url.protocol!=='https:'&&!(url.protocol==='http:'&&local))return false;
+    reconnect={kind:'cloud',endpoint};const session=generation;let cursor=null,failures=0;
+    connection='connecting';dispatch('connection',{state:connection,transport:'cloud'});
+    async function poll(){
+      if(session!==generation)return;
+      const target=new URL(url);if(cursor!==null)target.searchParams.set('after',String(cursor));
+      const controller=new AbortController();pollAbort=controller;const timeout=setTimeout(()=>controller.abort(),8000);
+      try{
+        const response=await fetch(target.href,{credentials:'omit',cache:'no-store',signal:controller.signal});
+        if(!response.ok)throw new Error('receipt service unavailable');
+        const data=await response.json();if(session!==generation)return;
+        if(!Number.isSafeInteger(data.cursor)||data.cursor<0||!Array.isArray(data.events)||data.events.length>64)throw new Error('invalid receipt response');
+        // Initial cursor subscribes from now; old receipts are never a welcome animation.
+        if(cursor!==null)data.events.forEach(receive);cursor=data.cursor;failures=0;
+        if(connection!=='connected'){connection='connected';dispatch('connection',{state:connection,transport:'cloud'});}
+      }catch(_){if(session!==generation)return;failures++;if(connection!=='reconnecting'){connection='reconnecting';dispatch('connection',{state:connection,transport:'cloud'});}}
+      finally{clearTimeout(timeout);if(pollAbort===controller)pollAbort=null;}
+      if(session===generation)pollTimer=setTimeout(poll,failures?Math.min(30000,2000*Math.pow(2,Math.min(failures-1,4))):document.hidden?10000:1500);
+    }
+    poll();return true;
+  }
+  window.GBTI_DONATIONS=Object.freeze({receive,preview,connect,connectPolling,disconnect,setSound,unlock,
     stop:()=>{queue.length=0;finish(false);},
     state:()=>({active:current?.tier.id||null,queued:queue.length,soundOn,audioState:audio?.state||'locked',connection})});
   window.addEventListener('gbti:receipt',event=>receive(event.detail));
@@ -281,8 +307,8 @@
   document.addEventListener('pointerdown',unlockFromPage,{capture:true,passive:true});
   document.addEventListener('keydown',event=>{unlockFromPage(event);if(event.key==='Escape')finish();},{capture:true});
   document.addEventListener('visibilitychange',()=>{if(document.hidden)finish(false);else drain();});
-  window.addEventListener('pagehide',()=>{finish(false);disconnect();if(audio)audio.close().catch(()=>{});audio=null;});
-  window.addEventListener('pageshow',event=>{if(event.persisted&&window.GBTI_RECEIPT_ENDPOINT)connect(window.GBTI_RECEIPT_ENDPOINT);});
+  window.addEventListener('pagehide',()=>{finish(false);const saved=reconnect;disconnect();reconnect=saved;if(audio)audio.close().catch(()=>{});audio=null;});
+  window.addEventListener('pageshow',event=>{if(event.persisted&&reconnect){const saved=reconnect;saved.kind==='cloud'?connectPolling(saved.endpoint):connect(saved.endpoint);}});
   // Explicit configuration only. A static Pages site has no receipt service.
   if(window.GBTI_RECEIPT_ENDPOINT)connect(window.GBTI_RECEIPT_ENDPOINT);
 })();
