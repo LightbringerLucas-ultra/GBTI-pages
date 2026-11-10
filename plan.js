@@ -17,6 +17,7 @@
   let offset = 0;            // 情景调整的权益偏移量
   let sortKey = "score";     // 标的排序方式
   let expanded = {};         // 每张标的卡的展开状态
+  let pendingHeroImage = null;
 
   const OFFSETS = [
     { delta: 0, label: "规则默认", desc: "完全按测试结果给出的比例" },
@@ -27,8 +28,24 @@
   const SORT_NAME = { score: "匹配度", pePct: "估值分位", amount: "成交额" };
   const SAMPLE_TOTAL = 10000;
 
-  function moneyText(pct) {
-    return "¥" + (pct * SAMPLE_TOTAL / 100).toLocaleString("en-US");
+  // 先取整，再按小数余量补齐，保证四类资产的示例金额相加等于总额。
+  function moneySplit(allocation) {
+    const shares = allocation.map(function (sleeve) {
+      const exact = SAMPLE_TOTAL * sleeve.pct / 100;
+      const amount = Math.floor(exact);
+      return { key: sleeve.key, amount, remainder: exact - amount };
+    });
+    const remaining = SAMPLE_TOTAL - shares.reduce(function (total, share) {
+      return total + share.amount;
+    }, 0);
+    shares.sort(function (a, b) { return b.remainder - a.remainder; });
+    return Object.fromEntries(shares.map(function (share, index) {
+      return [share.key, share.amount + (index < remaining ? 1 : 0)];
+    }));
+  }
+
+  function moneyText(amount) {
+    return "¥" + amount.toLocaleString("en-US");
   }
 
   function palette() {
@@ -155,7 +172,7 @@
 
     const value = $("plan-equity");
     const label = $("plan-donut-label");
-    if (value) value.textContent = moneyText(sleeve ? sleeve.pct : 100);
+    if (value) value.textContent = moneyText(sleeve ? moneySplit(basePlan.allocation)[sleeve.key] : SAMPLE_TOTAL);
     if (label) label.textContent = sleeve ? sleeve.name + " " + sleeve.pct + "%" : "示例总额 · 四类合计";
 
     document.querySelectorAll(".plan-bar").forEach(function (li) {
@@ -177,21 +194,43 @@
 
   /* ---------- 各区块 ---------- */
 
-  function refreshHeroImage() {
+  function refreshHeroImage(personaChanged) {
     const figure = $("plan-hero-figure");
     const entry = characterImages[figure.dataset.imageCode];
-    if (entry) {
-      const src = themedImageSrc(entry);
-      if (figure.getAttribute("src") !== src) figure.src = src;
+    if (!entry) return;
+    const src = themedImageSrc(entry);
+    if (figure.getAttribute("src") === src) {
+      pendingHeroImage = null;
+      return;
     }
+    if (personaChanged || !figure.naturalWidth) {
+      pendingHeroImage = null;
+      figure.src = src;
+      return;
+    }
+
+    // 新皮肤加载后再替换，快速切换时只采用最后一次请求。
+    const image = new Image();
+    pendingHeroImage = image;
+    image.onload = function () {
+      if (pendingHeroImage !== image) return;
+      figure.src = src;
+      pendingHeroImage = null;
+    };
+    image.onerror = function () {
+      if (pendingHeroImage === image) pendingHeroImage = null;
+    };
+    image.src = src;
   }
 
   function renderHero(outcome) {
     const persona = outcome.personality;
     $("plan-hero").hidden = !persona;
     if (!persona) return;
-    $("plan-hero-figure").dataset.imageCode = persona.imageCode;
-    refreshHeroImage();
+    const figure = $("plan-hero-figure");
+    const personaChanged = figure.dataset.imageCode !== persona.imageCode;
+    figure.dataset.imageCode = persona.imageCode;
+    refreshHeroImage(personaChanged);
     $("plan-hero-name").textContent = persona.name + "　" + persona.code;
     $("plan-hero-desc").textContent = persona.motto;
     $("plan-hero-axes").innerHTML = dimensions.map(function (dimension) {
@@ -219,7 +258,9 @@
     const box = $("plan-bars");
     if (!box) return;
     box.replaceChildren();
+    const amounts = moneySplit(allocation);
     allocation.forEach(function (sleeve) {
+      const amount = moneyText(amounts[sleeve.key]);
       const li = document.createElement("li");
       li.className = "plan-bar";
       li.dataset.sleeve = sleeve.key;
@@ -228,7 +269,7 @@
       btn.className = "pb-btn";
       btn.type = "button";
       btn.setAttribute("aria-pressed", "false");
-      btn.setAttribute("aria-label", sleeve.name + " " + moneyText(sleeve.pct) + "，占 " + sleeve.pct + "%");
+      btn.setAttribute("aria-label", sleeve.name + " " + amount + "，占 " + sleeve.pct + "%");
 
       const head = document.createElement("span");
       head.className = "pb-head";
@@ -239,7 +280,7 @@
       name.textContent = sleeve.name;
       const money = document.createElement("strong");
       money.className = "pb-money";
-      money.textContent = moneyText(sleeve.pct);
+      money.textContent = amount;
       head.append(dot, name, money);
 
       const track = document.createElement("span");
@@ -455,6 +496,7 @@
 
       body.append(reasons, actions);
       li.append(toggle, metrics, body);
+      li.style.setProperty("--plan-stock-delay", index * 45 + "ms");
       box.appendChild(li);
     });
   }
@@ -797,6 +839,7 @@
     const section = $("plan");
     if (section) section.hidden = true;
     basePlan = null;
+    pendingHeroImage = null;
     baseAllocation = [];
     selectedSleeve = null;
     hoverSleeve = null;

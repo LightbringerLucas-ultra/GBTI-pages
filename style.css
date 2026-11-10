@@ -552,6 +552,9 @@ html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
   border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
+@media (prefers-reduced-motion: no-preference) {
+  .plan-stock { animation: rise .52s var(--ease) var(--plan-stock-delay, 0ms) both; }
+}
 .plan-stock:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm); }
 .plan-stock[data-open="true"] { border-color: color-mix(in srgb, var(--red) 34%, var(--line)); box-shadow: var(--shadow-sm); }
 
