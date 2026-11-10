@@ -1,0 +1,117 @@
+/* GBTI 配对玩法：标的人格卡、组合体检、反向榜 */
+
+.match-modal {
+  width: min(680px, 94vw);
+  max-width: 680px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.match-modal::backdrop { background: rgba(24, 20, 16, .55); }
+.match-shell { position: relative; }
+.match-close {
+  position: absolute; top: 10px; right: 12px; z-index: 2;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: var(--surface);
+  color: var(--muted); font-size: 14px; line-height: 1; cursor: pointer;
+}
+.match-close:hover { color: var(--red); border-color: var(--red); }
+
+.match-card { padding: 26px 28px 22px; }
+.match-eyebrow {
+  margin: 0 0 12px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--red); font-weight: 700;
+}
+/* 顶部：左图右文 */
+.match-top { display: grid; gap: 16px; margin-bottom: 16px; }
+.match-top.has-figure { grid-template-columns: 132px minmax(0, 1fr); align-items: start; }
+.match-figure { display: none; }
+.match-top.has-figure .match-figure { display: block; }
+.match-figure .gb-figure { border-radius: 12px; }
+.match-top-main { min-width: 0; }
+.match-name { margin: 0 0 4px; font-size: 28px; line-height: 1.25; color: var(--ink-strong); }
+.match-code { margin: 0; font-size: 12px; color: var(--muted); }
+.match-nick {
+  margin: 12px 0 8px; font-size: 22px; font-weight: 700; color: var(--red);
+  letter-spacing: .02em;
+}
+/* 组合体检：一排人脸 */
+.match-faces { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 12px; }
+.match-face { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 56px; }
+.match-face em {
+  font-style: normal; font-size: 10.5px; color: var(--muted);
+  max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.match-face.is-worst em { color: var(--red); font-weight: 700; }
+.match-face.is-worst .gb-face { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--red); }
+/* 反向榜：名称前的小头像 */
+.match-cell { display: inline-flex; align-items: center; gap: 8px; }
+.match-cell > span { display: flex; flex-direction: column; line-height: 1.3; }
+.match-dimline { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 16px; }
+.match-dim {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--line-strong); background: var(--surface-muted);
+  font-size: 11px; color: var(--muted);
+}
+.match-dim b { font-family: "Times New Roman", serif; font-size: 13px; color: var(--ink); }
+
+.match-traits { margin: 0 0 18px; padding: 0; list-style: none; }
+.match-traits li {
+  position: relative; padding-left: 14px; margin-bottom: 8px;
+  font-size: 13.5px; line-height: 1.65; color: var(--ink);
+}
+.match-traits li::before {
+  content: ""; position: absolute; left: 0; top: 9px;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--red);
+}
+
+.match-score {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 14px 16px; margin-bottom: 14px;
+  border-radius: 12px; background: var(--surface-muted);
+  border-left: 3px solid var(--red);
+}
+.match-score-num {
+  font-family: "Times New Roman", serif; font-size: 46px; font-weight: 700;
+  line-height: 1; color: var(--red);
+}
+.match-score-num i { font-style: normal; font-size: 18px; margin-left: 2px; }
+.match-score-text { font-size: 12.5px; color: var(--muted); }
+
+.match-diff { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.match-diff-item { font-size: 12px; color: var(--muted); }
+
+.match-say {
+  margin: 0 0 16px; padding: 12px 14px;
+  border-radius: 10px; border: 1px dashed var(--line-strong);
+  font-size: 13.5px; line-height: 1.7; color: var(--ink);
+}
+.match-foot { margin: 0 0 18px; font-size: 11.5px; line-height: 1.7; color: var(--faint); }
+.match-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.match-votes { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 18px; }
+.match-vote { display: grid; grid-template-columns: 68px 1fr auto; gap: 10px; align-items: center; font-size: 12px; color: var(--muted); }
+.match-vote-bar { height: 7px; border-radius: 999px; background: var(--surface-muted); overflow: hidden; }
+.match-vote-bar i { display: block; height: 100%; background: var(--red); opacity: .75; }
+.match-vote em { font-style: normal; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.match-lines { margin: 0 0 16px; padding-left: 18px; font-size: 13.5px; line-height: 1.8; color: var(--ink); }
+
+.match-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 4px 0 18px; }
+.match-table th, .match-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+.match-table th { font-weight: 700; color: var(--muted); font-size: 11px; }
+.match-table td { color: var(--ink); white-space: nowrap; }
+.match-sub { display: block; font-size: 10.5px; color: var(--faint); }
+
+@media (max-width: 560px) {
+  .match-card { padding: 20px 16px 18px; }
+  .match-top.has-figure { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; }
+  .match-name { font-size: 21px; }
+  .match-nick { font-size: 18px; }
+  .match-score-num { font-size: 36px; }
+  .match-table { font-size: 11.5px; }
+  .match-face { width: 48px; }
+  .match-face em { max-width: 48px; }
+}

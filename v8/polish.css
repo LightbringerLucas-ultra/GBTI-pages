@@ -1,0 +1,108 @@
+/* ==========================================================================
+   GBTI 共用视觉组件样式
+   头像、竖版人物图、进入动效、四维条。全部走设计令牌，七套皮肤自动跟随。
+   ========================================================================== */
+
+/* ---------- 小圆头像：只取插画上部的人物头部 ---------- */
+.gb-face {
+  display: inline-block; flex: none;
+  width: var(--gb-face-size, 24px); height: var(--gb-face-size, 24px);
+  border-radius: 50%; overflow: hidden;
+  background: var(--surface-muted);
+  border: 1px solid var(--line-strong);
+  vertical-align: middle;
+}
+.gb-face img {
+  width: 100%; height: 100%; display: block;
+  object-fit: cover; object-position: 50% 16%;
+}
+.gb-face--ring { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--red); }
+
+/* ---------- 竖版人物图：3:4，保留场景 ---------- */
+.gb-figure {
+  display: block; position: relative; overflow: hidden;
+  border-radius: 14px; background: var(--surface-muted);
+  aspect-ratio: 3 / 4;
+}
+.gb-figure img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.gb-figure::after {
+  content: ""; position: absolute; inset: 0;
+  box-shadow: inset 0 -40px 40px -20px rgba(24, 20, 16, .28);
+  pointer-events: none;
+}
+
+/* ---------- 四维字母胶囊：只有四码、没有逐题得分时用 ---------- */
+.gb-codebox { grid-column: 1 / -1; }
+/* 四个胶囊等分整行，避免右边留出一大片空白。 */
+.gb-codechips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.gb-codechip {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 5px 12px; border-radius: var(--radius-pill, 999px);
+  background: var(--surface-muted); border: 1px solid var(--line);
+  font-size: 12.5px; color: var(--ink);
+}
+.gb-codechip b { font-size: 10.5px; letter-spacing: .08em; color: var(--red); }
+.gb-codehint { margin: 8px 0 0; font-size: 11.5px; color: var(--muted); }
+@media (max-width: 560px) {
+  .gb-codechips { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .gb-codechip { padding: 4px 10px; font-size: 12px; }
+}
+
+/* ---------- 进入动效 ----------
+   只在脚本正常运行并给 html 加上 gb-anim 之后才隐藏，脚本失效时内容照常显示。 */
+.gb-anim [data-rise] { opacity: 0; }
+.gb-anim [data-rise].is-in { animation: gbRise .52s cubic-bezier(.22, .61, .36, 1) both; }
+@keyframes gbRise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gb-anim [data-rise] { opacity: 1; }
+  .gb-anim [data-rise].is-in { animation: none; }
+}
+
+/* ---------- 四维条：左右两段堆叠，一眼看出偏哪边 ---------- */
+.gb-axes { display: grid; gap: 10px; }
+.gb-axis { display: grid; gap: 5px; }
+.gb-axis-head {
+  display: flex; justify-content: space-between; gap: 10px;
+  font-size: 11.5px; color: var(--muted);
+}
+.gb-axis-head b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.gb-axis-head .gb-axis-r { text-align: right; }
+.gb-axis-track {
+  display: flex; height: 7px; border-radius: 999px; overflow: hidden;
+  background: var(--surface-muted);
+}
+.gb-axis-track i { display: block; height: 100%; transition: width .5s cubic-bezier(.22, .61, .36, 1); }
+.gb-axis-l-fill { background: var(--line-strong); }
+.gb-axis-r-fill { background: var(--red); opacity: .82; }
+
+/* ---------- 轻抬升 ---------- */
+.gb-lift { transition: transform .22s cubic-bezier(.22, .61, .36, 1), box-shadow .22s ease; }
+.gb-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -16px rgba(30, 24, 18, .45); }
+
+/* ---------- 结果页配置区门面 ---------- */
+.plan-hero {
+  display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 18px;
+  align-items: center;
+  padding: 16px; margin-bottom: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--surface-muted), var(--surface) 65%);
+}
+.plan-hero-figure { width: 128px; }
+.plan-hero-kicker {
+  margin: 0 0 4px; font-size: 11px; letter-spacing: .16em;
+  color: var(--red); font-weight: 700; text-transform: uppercase;
+}
+.plan-hero-main h3 { margin: 0 0 6px; font-size: 20px; color: var(--ink-strong); }
+.plan-hero-desc { margin: 0 0 12px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+
+@media (max-width: 620px) {
+  .plan-hero { grid-template-columns: 92px minmax(0, 1fr); gap: 12px; padding: 12px; }
+  .plan-hero-figure { width: 92px; }
+  .plan-hero-main h3 { font-size: 17px; }
+  .plan-hero-desc { margin-bottom: 9px; font-size: 12px; }
+  .gb-axis-head { font-size: 10.5px; }
+}

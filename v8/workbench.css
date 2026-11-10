@@ -1,0 +1,152 @@
+/* GBTI 标的筛选工作台 · 特有样式
+ * 外壳、卡片、按钮、表格基础样式来自 subpage.css；颜色一律取 style.css 令牌。
+ */
+
+/* ---------- 人格视图 ---------- */
+.wb-persona-main { display: flex; gap: 16px; align-items: center; }
+.wb-persona-main > div:last-child { flex: 1 1 auto; min-width: 0; }
+.wb-persona-face { width: 84px; flex: none; }
+.wb-persona-face[hidden] { display: none; }
+.wb-persona-face .gb-figure { border-radius: 12px; }
+.wb-persona-title { font-size: 15px; font-weight: 700; color: var(--ink-strong); }
+.wb-persona-title span { font-weight: 400; color: var(--muted); font-size: 12.5px; margin-left: 8px; }
+.wb-persona-bars { margin-top: 10px; max-width: 820px; }
+.wb-bar {
+  font-size: 11.5px; color: var(--muted);
+  padding: 3px 9px; border-radius: var(--radius-pill, 999px);
+  background: var(--surface-muted); border: 1px solid var(--line);
+}
+.wb-bar b { color: var(--ink); font-weight: 700; }
+.wb-persona-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-top: 16px; }
+.wb-persona-switch { min-width: 210px; }
+.wb-persona-switch select { background: var(--surface); }
+.wb-btn.is-on { background: var(--red-deep, var(--red)); }
+.wb-persona-note a { color: var(--red); }
+
+/* ---------- 风格分布卡 ---------- */
+.wb-insight h2 { font-size: 15px; margin: 0 0 12px; }
+.wb-insight-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.wb-insight-cell {
+  background: color-mix(in srgb, var(--hero-soft) 34%, var(--surface));
+  border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+}
+.wb-insight-cell b {
+  display: block; font-size: 19px; color: var(--ink-strong);
+  font-variant-numeric: tabular-nums; line-height: 1.35;
+}
+.wb-insight-cell span { font-size: 11.5px; color: var(--muted); }
+.wb-insight-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+
+/* ---------- 筛选条件 ---------- */
+.wb-filter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.wb-check { color: var(--ink); }
+
+/* ---------- 结果区 ---------- */
+.wb-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wb-count {
+  font-size: 14px; font-weight: 700; color: var(--ink-strong);
+  font-variant-numeric: tabular-nums;
+}
+.wb-toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.wb-table th, .wb-table td { padding: 9px 11px; white-space: nowrap; }
+/* 股票人格列（第 16 列）内容较长，给足宽度，避免四码与名称被压成两行。 */
+.wb-table th:nth-child(16), .wb-table td:nth-child(16) { min-width: 152px; }
+.wb-table th:first-child, .wb-table td:first-child,
+.wb-table th:nth-child(2), .wb-table td:nth-child(2),
+.wb-table th:nth-child(3), .wb-table td:nth-child(3),
+.wb-table th:nth-child(4), .wb-table td:nth-child(4),
+.wb-table th:nth-child(5), .wb-table td:nth-child(5) { text-align: left; }
+
+.wb-up { color: var(--red); }
+.wb-down { color: var(--green); }
+.wb-muted { color: var(--faint); }
+.wb-tag {
+  display: inline-block; padding: 1px 8px; margin-right: 4px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-pill, 999px);
+  font-size: 11px; color: var(--muted); background: var(--surface-muted);
+}
+.wb-tag-derived { border-style: dashed; }
+.wb-ptag {
+  display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap;
+  padding: 2px 8px; border-radius: var(--radius-pill, 999px);
+  border: 1px solid var(--line-strong); background: var(--surface-muted);
+  font-family: "Times New Roman", serif; font-size: 12px; font-weight: 700;
+  color: var(--ink); letter-spacing: .5px;
+}
+.wb-ptag i { font-style: normal; font-family: inherit; font-size: 11px; font-weight: 400; color: var(--muted); }
+.wb-ptag.is-same { border-color: var(--red); color: var(--red); background: var(--red-soft, rgba(196,66,54,.08)); }
+.wb-ptag.is-same i { color: var(--red); opacity: .85; }
+.wb-ptag[data-card] { cursor: pointer; transition: border-color .15s, color .15s; }
+.wb-ptag .gb-face { width: 16px; height: 16px; border: none; }
+.wb-ptag[data-card]:hover { border-color: var(--red); color: var(--red); }
+.wb-ptag[data-card]:hover i { color: var(--red); opacity: .85; }
+
+/* 配对玩法入口 */
+.wb-match-bar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px; padding-top: 13px; border-top: 1px dashed var(--line);
+}
+.wb-match-label { font-size: 11px; letter-spacing: .14em; color: var(--muted); font-weight: 700; }
+.wb-match-hint { font-size: 11.5px; color: var(--faint); margin-left: auto; }
+.wb-fav {
+  cursor: pointer; border: none; background: none;
+  font-size: 15px; color: var(--faint); padding: 0 2px;
+}
+.wb-fav:hover, .wb-fav.is-on { color: var(--red); }
+.wb-compare-box { width: 14px; height: 14px; accent-color: var(--red); }
+.wb-empty { margin-top: 14px; }
+
+.wb-table tbody tr.wb-hit { background: color-mix(in srgb, var(--red-soft) 55%, var(--surface)); }
+.wb-table tbody tr.wb-hit td:first-child { border-left: 3px solid var(--red); }
+.wb-score { font-weight: 700; color: var(--ink-strong); font-variant-numeric: tabular-nums; }
+.wb-hit-mark {
+  display: inline-block; margin-left: 5px; padding: 0 6px;
+  border: 1px solid var(--red); border-radius: var(--radius-pill, 999px);
+  font-size: 10px; color: var(--red);
+}
+
+/* ---------- 对比卡 ---------- */
+.wb-compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.wb-compare-table th, .wb-compare-table td {
+  border: 1px solid var(--line); padding: 8px 11px;
+  text-align: left; color: var(--ink);
+}
+.wb-compare-table th { background: var(--surface-muted); }
+
+/* ---------- 分页 ---------- */
+.wb-pager {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+.wb-page-btn { padding: 6px 14px; font-size: 12.5px; }
+.wb-page-btn:disabled { opacity: .38; cursor: not-allowed; }
+.wb-page-info {
+  font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums;
+  margin-right: auto;
+}
+.wb-page-jump { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.wb-page-input {
+  width: 56px; padding: 5px 8px; text-align: center;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--ink);
+  font-family: inherit; font-size: 12.5px; font-variant-numeric: tabular-nums;
+}
+.wb-page-input:focus { outline: none; border-color: var(--red); }
+
+@media (max-width: 900px) {
+  .wb-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wb-insight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .wb-filter-grid { grid-template-columns: 1fr; }
+  .wb-pager { gap: 8px; }
+  .wb-page-info { flex: 1 1 100%; margin: 0 0 2px; }
+  .wb-page-btn { flex: 1; }
+  .wb-page-jump { margin-left: auto; }
+  .wb-persona-actions { align-items: stretch; }
+  .wb-persona-actions .sp-btn { flex: 1; }
+  .wb-persona-switch { min-width: 100%; }
+  .wb-table { font-size: 12px; }
+}

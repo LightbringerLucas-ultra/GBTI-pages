@@ -1,0 +1,180 @@
+/* GBTI 今日市场人格：首页横条 + 展开对照弹窗
+   配色走主站令牌，涨用红、跌用绿，跟随皮肤。 */
+
+.mm, .mm-modal {
+  --mm-accent: var(--red);
+  /* 用 accent 与当前底色混合，明暗主题都不需要另写一套变量。 */
+  --mm-accent-soft: color-mix(in srgb, var(--red) 10%, var(--surface));
+}
+.mm[data-mood="bear"], .mm-modal[data-mood="bear"] {
+  --mm-accent: var(--green);
+  --mm-accent-soft: color-mix(in srgb, var(--green) 10%, var(--surface));
+}
+.mm { margin: 0 0 16px; }
+
+/* ---------- 首页横条 ---------- */
+.mm-band {
+  display: flex; align-items: center; gap: 16px; width: 100%;
+  padding: 12px 18px 12px 12px;
+  border: 1px solid var(--line); border-radius: var(--radius, 18px);
+  background: linear-gradient(100deg, var(--mm-accent-soft) 0%, var(--surface) 64%);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer; text-align: left; font: inherit; color: inherit;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.mm-band:hover { border-color: var(--mm-accent); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.mm-band:focus-visible { outline: 2px solid var(--mm-accent); outline-offset: 2px; }
+
+.mm-thumb {
+  width: 78px; height: 78px; flex: none; border-radius: 16px;
+  object-fit: cover; object-position: 50% 46%;
+  background: var(--surface-muted);
+  box-shadow: 0 0 0 3px var(--mm-accent-soft), 0 0 0 4px var(--mm-accent);
+}
+
+.mm-band-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.mm-kicker {
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--mm-accent); font-weight: 700;
+}
+.mm-kicker i { font-style: normal; letter-spacing: 0; color: var(--muted); font-weight: 600; }
+.mm-name {
+  font-size: 19px; font-weight: 800; color: var(--ink-strong); letter-spacing: .01em;
+  line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mm-name em { font-style: normal; color: var(--mm-accent); margin-right: 8px; letter-spacing: .04em; }
+.mm-stats {
+  font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.mm-side {
+  display: flex; flex-direction: column; gap: 2px; align-items: flex-end;
+  padding-left: 16px; border-left: 1px dashed var(--line);
+  flex: none; max-width: 42%;
+}
+.mm-side-kicker { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+.mm-side-main {
+  font-size: 13px; font-weight: 700; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+
+.mm-arrow {
+  flex: none; margin-left: 4px; font-size: 12px; font-weight: 700; color: var(--mm-accent);
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+}
+
+/* ---------- 展开弹窗 ---------- */
+.mm-modal { max-width: 760px; width: calc(100% - 32px); }
+/* 打开时浏览器会把焦点放到关闭按钮上，这里不让它画出多余的框。 */
+.mm-modal .icon-button:focus { outline: none; }
+.mm-dialog-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 18px 20px 0;
+}
+.mm-dialog-head h2 { margin: 0; font-size: 15px; color: var(--ink-strong); letter-spacing: .02em; }
+.mm-dialog-head p { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
+.mm-body { padding: 14px 20px 20px; max-height: 74vh; overflow-y: auto; }
+
+.mm-hero-card {
+  display: flex; gap: 18px; align-items: stretch;
+  padding: 14px; border-radius: var(--radius, 18px);
+  background: linear-gradient(135deg, var(--mm-accent-soft) 0%, var(--surface) 100%);
+  border: 1px solid var(--line);
+}
+.mm-hero-art { width: 196px; flex: none; align-self: center; aspect-ratio: 1 / 1; }
+.mm-hero-art img {
+  width: 100%; height: 100%; display: block; border-radius: 14px;
+  object-fit: cover; background: var(--surface);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+.mm-hero-main { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.mm-hero-kicker { margin: 0 0 4px; font-size: 11.5px; color: var(--muted); letter-spacing: .06em; }
+.mm-hero-code {
+  margin: 0; font-size: 40px; line-height: 1.05; letter-spacing: .06em;
+  font-weight: 800; color: var(--mm-accent);
+}
+.mm-hero-name { margin: 4px 0 8px; font-size: 20px; font-weight: 700; color: var(--ink-strong); }
+.mm-hero-desc { margin: 0 0 4px; font-size: 12.5px; line-height: 1.65; color: var(--muted); }
+.mm-chips { margin-top: 10px; }
+
+.mm-facts {
+  list-style: none; margin: 14px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;
+}
+.mm-facts li {
+  padding: 11px 13px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface);
+}
+.mm-facts span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.mm-facts strong {
+  font-size: 15px; color: var(--ink-strong); font-variant-numeric: tabular-nums; font-weight: 700;
+}
+.mm-art-note { margin: 10px 0 0; font-size: 11.5px; color: var(--faint); }
+
+.mm-compare {
+  margin-top: 14px; padding: 16px 18px;
+  border-radius: var(--radius, 18px); border: 1px solid var(--mm-accent);
+  background: var(--mm-accent-soft);
+}
+.mm-compare.is-empty { border-color: var(--line); border-style: dashed; background: var(--surface-muted); }
+.mm-compare-text { color: var(--ink); }
+.mm-compare.is-empty p { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+.mm-compare-kicker { margin: 0 0 6px; font-size: 11.5px; color: var(--muted); letter-spacing: .04em; }
+.mm-compare-hits { margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.mm-compare-hits b { font-size: 34px; line-height: 1; color: var(--mm-accent); font-weight: 800; }
+.mm-compare-hits span { font-size: 12.5px; color: var(--muted); }
+.mm-compare-text { margin: 8px 0 0; font-size: 13.5px; line-height: 1.7; color: var(--ink); }
+.mm-compare-link {
+  display: inline-block; margin-top: 10px; font-size: 12.5px; font-weight: 700;
+  color: var(--mm-accent); text-decoration: none;
+  border-bottom: 1px solid currentColor; padding-bottom: 1px;
+}
+
+.mm-foot {
+  margin: 14px 0 0; font-size: 11.5px; line-height: 1.75; color: var(--faint);
+}
+
+@media (max-width: 720px) {
+  .mm-band { gap: 10px; padding: 10px 12px; }
+  .mm-thumb { width: 52px; height: 52px; border-radius: 12px; }
+  .mm-name { font-size: 16px; }
+  .mm-stats { font-size: 11px; }
+  .mm-side { display: none; }
+  .mm-arrow { font-size: 11px; }
+  .mm-hero-card { flex-direction: column; }
+  .mm-hero-art { width: 100%; max-height: 220px; }
+  .mm-hero-art img { height: 220px; }
+  .mm-hero-code { font-size: 32px; }
+  .mm-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mm-body { max-height: 78vh; }
+}
+
+/* 弹窗里的四维票数条：跟着当日涨跌用红或绿，避免熊市里出现一片红 */
+.mm-axes { margin-top: 12px; gap: 7px; }
+.mm-axes .gb-axis-r-fill { background: var(--mm-accent); }
+/* 暗色与节日皮肤下轨道本身也是深色，把左段和轨道提亮，否则整条糊成一片。 */
+html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
+        [data-theme="spring"], [data-theme="midautumn"]) .mm-axes .gb-axis-track {
+  background: rgba(255, 255, 255, .16);
+}
+html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
+        [data-theme="spring"], [data-theme="midautumn"]) .mm-axes .gb-axis-l-fill {
+  background: rgba(255, 255, 255, .48);
+}
+.mm-axes .gb-axis-head { font-size: 11px; }
+.mm-split-note {
+  margin: 9px 0 0; font-size: 11.5px; line-height: 1.7; color: var(--muted);
+  padding-left: 9px; border-left: 2px solid var(--line-strong);
+}
+
+/* 用自带的关键帧替代通用弹窗动画：结束帧固定为完全不透明，
+   某些环境（无头渲染、后台标签页）把动画冻结在首帧时也不会整块发虚。 */
+.mm-modal[open] { animation: mmIn 200ms cubic-bezier(.22, .61, .36, 1) both; }
+@keyframes mmIn {
+  from { opacity: .96; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mm-modal[open] { animation: none; }
+}

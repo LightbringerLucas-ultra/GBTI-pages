@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "sources": [
+    { "id": "tushare", "name": "Tushare 新闻通讯", "kind": "tushare", "tier": "media", "enabled": true },
+    { "id": "chinanews", "name": "中国新闻网", "kind": "rss", "tier": "established", "url": "https://www.chinanews.com.cn/rss/finance.xml", "enabled": true },
+    { "id": "wallstreetcn", "name": "华尔街见闻", "kind": "wallstreetcn", "tier": "media", "url": "https://api-one.wallstcn.com/apiv1/content/lives", "enabled": true }
+  ]
+}

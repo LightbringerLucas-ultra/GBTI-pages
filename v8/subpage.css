@@ -1,0 +1,226 @@
+/* GBTI 子页面共用外壳 · 工作台 / 历史起伏
+ * 颜色全部取自 style.css 的设计令牌，随首页皮肤自动变化。
+ */
+:root { color-scheme: light; }
+html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
+        [data-theme="spring"], [data-theme="midautumn"]) { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body {
+  margin: 0;
+  background: var(--paper);
+  background-image:
+    radial-gradient(900px 420px at 12% -8%, color-mix(in srgb, var(--hero-soft) 70%, transparent), transparent 70%),
+    radial-gradient(760px 380px at 92% 0%, color-mix(in srgb, var(--hero-accent) 12%, transparent), transparent 72%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-sans, "Microsoft YaHei", sans-serif);
+  font-style: normal;
+  line-height: 1.6;
+}
+a { color: var(--red); }
+/* 首页节日皮肤的全页固定装饰按首页顶栏定位，子页面改用标题区氛围光表达皮肤。 */
+body::before, body::after { display: none !important; content: none !important; }
+
+.sp-shell { max-width: 1240px; margin: 0 auto; padding: 0 22px 56px; }
+
+/* ---------- 顶栏与皮肤选择器 ---------- */
+.sp-topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  margin: 0 -22px 22px; padding: 10px 22px;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.sp-brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink-strong); }
+.sp-brand-mark {
+  width: 28px; height: 28px; border-radius: 9px;
+  background: var(--red); color: #fff;
+  display: grid; place-items: center;
+  font-size: 16px; font-weight: 800; line-height: 1;
+  box-shadow: var(--shadow-xs);
+}
+html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
+        [data-theme="spring"], [data-theme="midautumn"]) .sp-brand-mark { color: #17140f; }
+.sp-brand-name { font-size: 14px; font-weight: 700; letter-spacing: .4px; }
+.sp-nav { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.sp-nav a {
+  color: var(--muted); text-decoration: none; font-size: 13px;
+  padding: 4px 0; border-bottom: 2px solid transparent; transition: color var(--dur, 240ms);
+}
+.sp-nav a:hover { color: var(--ink); }
+.sp-nav a.is-current { color: var(--ink-strong); font-weight: 700; border-bottom-color: var(--red); }
+
+.sp-skin { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.sp-skin-label { font-size: 11.5px; color: var(--muted); white-space: nowrap; margin-right: 3px; }
+.sp-skin-label b { color: var(--ink); font-weight: 700; }
+.sp-skin-dot {
+  width: 24px; height: 24px; padding: 0; border-radius: 50%;
+  border: 2px solid var(--line-strong); background: var(--sp-dot);
+  cursor: pointer; display: grid; place-items: center;
+  font-size: 11px; line-height: 1; transition: transform 160ms, box-shadow 160ms;
+}
+.sp-skin-dot span { opacity: .85; }
+.sp-skin-dot:hover { transform: translateY(-2px); }
+.sp-skin-dot.is-on {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--red);
+}
+.sp-skin-dot:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+/* ---------- 标题区 ---------- */
+.sp-hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--hero-soft) 48%, var(--surface)), var(--surface) 78%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 18px);
+  padding: 24px 28px 22px; margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.sp-hero::after {
+  content: ""; position: absolute; right: -60px; top: -90px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--hero-accent) 26%, transparent), transparent 68%);
+  pointer-events: none;
+}
+.sp-eyebrow {
+  margin: 0 0 6px; font-size: 11.5px; font-weight: 700;
+  letter-spacing: 1.6px; color: var(--hero-accent); text-transform: uppercase;
+}
+.sp-hero h1 {
+  position: relative; margin: 0 0 6px;
+  font-size: clamp(23px, 3vw, 31px); line-height: 1.3;
+  font-weight: 800; letter-spacing: .3px; color: var(--ink-strong);
+}
+.sp-hero p.sp-sub { position: relative; margin: 0; font-size: 13px; color: var(--muted); }
+.sp-hero-meta { position: relative; display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.sp-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 11px; border-radius: var(--radius-pill, 999px);
+  border: 1px solid color-mix(in srgb, var(--hero-accent) 30%, var(--line));
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+  font-size: 11.5px; color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.sp-chip b { color: var(--hero-accent); font-weight: 700; }
+
+/* ---------- 细提示条：取代顶部大段公示 ---------- */
+.sp-strip {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 0 0 16px; padding: 0 2px 10px;
+  border-bottom: 1px dashed var(--line);
+  font-size: 12px; color: var(--muted);
+}
+.sp-strip b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sp-strip a { color: var(--red); text-decoration: none; border-bottom: 1px solid currentColor; }
+.sp-strip a:hover { opacity: .8; }
+.sp-strip .sp-strip-spacer { flex: 1; }
+
+/* ---------- 通用卡片 ---------- */
+.sp-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 18px);
+  padding: 18px 20px; margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.sp-card > h2, .sp-card h2 {
+  margin: 0 0 12px; font-size: 15px; font-weight: 700;
+  color: var(--ink-strong); letter-spacing: .2px;
+}
+.sp-card-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.sp-card-head h2 { margin: 0; }
+.sp-card-head span { font-size: 12px; color: var(--muted); }
+.sp-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); line-height: 1.7; }
+.sp-accent { border-left: 3px solid var(--red); }
+
+/* ---------- 按钮与表单 ---------- */
+.sp-btn {
+  padding: 8px 15px; border-radius: var(--radius-pill, 999px);
+  border: 1px solid var(--red); background: var(--red); color: #fff;
+  font-size: 13px; cursor: pointer; font-family: inherit;
+  transition: background var(--dur, 240ms), transform 160ms;
+}
+.sp-btn:hover { background: var(--red-deep); transform: translateY(-1px); }
+html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
+        [data-theme="spring"], [data-theme="midautumn"]) .sp-btn:not(.sp-btn-ghost) { color: #17140f; }
+.sp-btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+.sp-btn-ghost:hover { background: var(--surface-muted); }
+.sp-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+.sp-field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--muted); }
+.sp-field input[type="search"], .sp-field input[type="number"], .sp-field select,
+.sp-select {
+  width: 100%; padding: 8px 10px;
+  border: 1px solid var(--line-strong); border-radius: 10px;
+  background: var(--surface); color: var(--ink);
+  font-size: 13px; font-family: inherit; font-style: normal;
+}
+.sp-field input::placeholder { color: var(--faint); }
+.sp-field :is(input, select):focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
+.sp-check { flex-direction: row; align-items: center; gap: 8px; align-self: end; padding-bottom: 9px; font-size: 13px; color: var(--ink); }
+.sp-check input { width: 15px; height: 15px; accent-color: var(--red); }
+
+/* ---------- 底部公示（默认折叠） ---------- */
+.sp-disclosure { margin-top: 30px; }
+.sp-disclosure details {
+  background: var(--paper-2); border: 1px solid var(--line);
+  border-radius: var(--radius, 18px); overflow: hidden;
+}
+.sp-disclosure summary {
+  cursor: pointer; padding: 14px 20px; list-style: none;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 13.5px; font-weight: 700; color: var(--ink-strong);
+}
+.sp-disclosure summary::-webkit-details-marker { display: none; }
+.sp-disclosure summary::before {
+  content: "＋"; color: var(--red); font-size: 15px; font-weight: 700;
+}
+.sp-disclosure details[open] summary::before { content: "－"; }
+.sp-disclosure summary .sp-summary-hint { font-weight: 400; font-size: 12px; color: var(--muted); }
+.sp-disclosure-body {
+  padding: 0 20px 18px; font-size: 12.5px; color: var(--muted);
+  border-top: 1px solid var(--line); padding-top: 14px;
+}
+.sp-disclosure-body p { margin: 0 0 8px; line-height: 1.8; }
+.sp-disclosure-body p:last-child { margin-bottom: 0; }
+.sp-disclosure-body b { color: var(--ink); font-weight: 700; }
+.sp-foot { margin-top: 20px; font-size: 12px; color: var(--muted); }
+.sp-foot p { margin: 0 0 4px; line-height: 1.7; }
+
+/* ---------- 表格通用 ---------- */
+.sp-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.sp-table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+.sp-table th, .sp-table td { padding: 9px 11px; border-bottom: 1px solid var(--line); text-align: right; color: var(--ink); }
+.sp-table thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--surface-muted); color: var(--ink);
+  font-weight: 700; cursor: pointer; user-select: none;
+}
+.sp-table thead th:hover { background: color-mix(in srgb, var(--hero-soft) 45%, var(--surface-muted)); }
+.sp-table tbody tr:hover { background: color-mix(in srgb, var(--hero-soft) 32%, var(--surface)); }
+.sp-table tbody tr:last-child td { border-bottom: none; }
+.sp-num { font-variant-numeric: tabular-nums; }
+.sp-up { color: var(--red); }
+.sp-down { color: var(--green); }
+.sp-muted { color: var(--faint); }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .sp-topbar { gap: 12px; }
+  .sp-skin-label { display: none; }
+}
+@media (max-width: 560px) {
+  .sp-shell { padding: 0 12px 40px; }
+  .sp-topbar { margin: 0 -12px 16px; padding: 9px 12px; gap: 10px; }
+  .sp-nav { gap: 12px; }
+  .sp-nav a { font-size: 12px; }
+  .sp-skin { width: 100%; margin-left: 0; justify-content: flex-start; }
+  .sp-skin-dot { width: 21px; height: 21px; font-size: 10px; }
+  .sp-hero { padding: 18px 16px; }
+  .sp-card { padding: 14px 12px; }
+  .sp-table { font-size: 12px; }
+  .sp-disclosure summary, .sp-disclosure-body { padding-left: 14px; padding-right: 14px; }
+}
