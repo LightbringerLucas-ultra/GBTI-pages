@@ -7,13 +7,16 @@
   <title>GBTI 历史起伏</title>
   <script src="theme-sync.js"></script>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="subpage.css">
-  <link rel="stylesheet" href="history.css">
+  <link rel="stylesheet" href="history.css?v=volatility-summary">
   <script src="questions.js" defer></script>
   <script src="scoring.js" defer></script>
+  <script src="characters.js" defer></script>
+  <script src="polish.js" defer></script>
   <script src="allocation.js" defer></script>
   <script src="index-history.js" defer></script>
-  <script src="history.js" defer></script>
+  <script src="history.js?v=volatility-summary" defer></script>
 </head>
 <body>
   <div class="sp-shell">
@@ -22,6 +25,7 @@
       <a class="sp-brand" href="index.html"><span class="sp-brand-mark">G</span><span class="sp-brand-name">GBTI V10</span></a>
       <nav class="sp-nav" aria-label="页面导航">
         <a href="index.html">人格测试</a>
+        <a href="index.html?section=plan">资产配置建议</a>
         <a href="workbench.html">筛选工作台</a>
         <a href="history.html" class="is-current">历史起伏</a>
       </nav>
@@ -46,11 +50,16 @@
     </p>
 
     <section class="sp-card hs-persona" aria-label="人格视图">
-      <div id="hs-persona-title" class="hs-persona-title"></div>
-      <div id="hs-persona-bars" class="hs-persona-bars"></div>
-      <div class="hs-persona-actions">
-        <label class="sp-field hs-switch"><span>换个人格看看</span><select id="hs-code" class="sp-select"></select></label>
-        <span id="hs-persona-note" class="sp-note hs-persona-note"></span>
+      <div class="hs-persona-main">
+        <div id="hs-persona-face" class="hs-persona-face" aria-hidden="true" hidden></div>
+        <div class="hs-persona-copy">
+          <div id="hs-persona-title" class="hs-persona-title"></div>
+          <div id="hs-persona-bars" class="hs-persona-bars"></div>
+          <div class="hs-persona-actions">
+            <label class="sp-field hs-switch"><span>换个人格看看</span><select id="hs-code" class="sp-select"></select></label>
+            <span id="hs-persona-note" class="sp-note hs-persona-note"></span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -75,6 +84,7 @@
         <div id="hs-tip" class="hs-tip" hidden></div>
       </div>
       <p class="sp-note">移动鼠标或用左右方向键查看任一交易日读数，点击可锁定十字线，再次点击解除。读数框显示当日公开指数点位、当日变动与距区间高点的回撤，不是任何人格或组合的收益。</p>
+      <div id="hs-summary" class="hs-summary" aria-label="当前曲线的关键指标"></div>
       <div id="hs-legend" class="hs-legend"></div>
     </section>
 

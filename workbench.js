@@ -15,6 +15,8 @@
   var deriveStyles = ALLOC && ALLOC._internal ? ALLOC._internal.deriveStyles : null;
   var scoreStock = ALLOC && ALLOC._internal ? ALLOC._internal.scoreStock : null;
   var styleFor = ALLOC ? ALLOC.styleFor : null;
+  var stockPersonalityOf = ALLOC ? ALLOC.stockPersonalityOf : null;
+  var stockThresholds = ALLOC ? ALLOC.stockThresholds : null;
   var STYLE_NAME = ALLOC && ALLOC.STYLE_NAME ? ALLOC.STYLE_NAME : {
     value: "价值稳健", quality: "质量成长", steady: "大盘稳健", trend: "趋势动量"
   };
@@ -24,6 +26,8 @@
 
   var PROGRESS_KEY = "gbti-progress-v6-20261013";
   var FAV_KEY = "gbti-workbench-favs";
+  /* 每页条数：408 行一次铺完又长又卡，按 20 条分页。导出仍走全部筛选结果，不受分页影响。 */
+  var PAGE_SIZE = 20;
   var GROUP_NAME = { manual: "人工候选池", index: "指数成分", fund: "配置载体" };
   var COLUMNS = [
     { key: "pick", label: "对比", kind: "pick" },
@@ -41,6 +45,7 @@
     { key: "pePct", label: "PE 分位 %", kind: "num", sort: "pePct", digits: 1 },
     { key: "pb", label: "市净率", kind: "num", sort: "pb", digits: 2 },
     { key: "mcapYi", label: "总市值 亿", kind: "num", sort: "mcapYi", digits: 1 },
+    { key: "personaCode", label: "股票人格", kind: "persona", sort: "personaCode" },
     { key: "styles", label: "风格标签", kind: "styles" }
   ];
 
@@ -56,7 +61,10 @@
     answerScores: null,
     cleared: false,
     styleFilterOn: false,
-    scoreCacheKey: null
+    sameOnly: false,
+    thresholds: null,
+    scoreCacheKey: null,
+    page: 1
   };
 
   function readFavs() {
@@ -163,6 +171,20 @@
   }
 
   /* ---------- 筛选分：与结果页示例标的同一套 scoreStock ---------- */
+  /* ---------- 股票人格：给每只标的贴四位代码 ---------- */
+  var PERSONA_NAME = {};
+  PERSONALITIES.forEach(function (p) { PERSONA_NAME[p.code] = p.name; });
+  function annotateStockPersona() {
+    if (!stockPersonalityOf || !stockThresholds || !MARKET || !MARKET.quotes) return;
+    if (!state.thresholds) state.thresholds = stockThresholds(MARKET.quotes);
+    state.rows.forEach(function (row) {
+      var p = stockPersonalityOf(row.quote, state.thresholds);
+      row.stockPersona = p;
+      row.personaCode = p ? p.code : "";
+      row.personaName = p ? (PERSONA_NAME[p.code] || "") : "";
+    });
+  }
+
   function computeScores() {
     state.rows.forEach(function (row) {
       row.score = null; row.parts = null; row.hit = false;
@@ -201,6 +223,12 @@
       "行情数据截止 " + MARKET.asOf + " 收盘，来源 " + MARKET.source + "，抓取时间 " + MARKET.fetchedAt +
         "。数据非实时，以交易所披露为准。" +
         (MARKET.hasPercentile ? "" : " 当前快照不含市盈率与市净率历史分位，相关列显示 --。"),
+      "股票人格列的判定规则：市盈率为正且不高于全池正值中位数记 F，否则记 M；换手率不高于全池中位数记 L，否则记 S；总市值不低于全池中位数记 D，否则记 A；当日振幅不高于全池中位数记 O，否则记 J。四个阈值随快照当期数据变化，取中位数，可在导出的 CSV 里逐只复算。" +
+        (state.thresholds
+          ? "当前阈值：市盈率 " + fmt(state.thresholds.pe, 2) + " 倍、换手率 " + fmt(state.thresholds.turnover, 2) +
+            "%、总市值 " + fmt(state.thresholds.mcapYi, 1) + " 亿、振幅 " + fmt(state.thresholds.amplitude, 2) + "%。"
+          : ""),
+      "股票人格是把本次测试的四维规则搬到标的上做的趣味对照，只表示这只标的在当日数据上落在这四个区间，不代表它的质地，不代表任何评价，也不构成对标的的推荐。",
       "本页仅作公开数据整理与信息展示，不构成投资建议，也不构成对任何证券的推荐或要约。本页不包含交易时机判断，不承诺收益，不代客理财。"
     ];
     if (state.persona) {
@@ -224,38 +252,66 @@
   function renderPersona() {
     var title = $("wb-persona-title"), bars = $("wb-persona-bars"), note = $("wb-persona-note");
     var sel = $("wb-code");
+    var face = $("wb-persona-face");
     if (!sel.options.length) {
       fillSelect("wb-code", [{ value: "", label: "公开浏览" }].concat(PERSONALITIES.map(function (p) {
         return { value: p.code, label: p.code + " " + p.name };
       })));
     }
     var filterBtn = $("wb-style-filter"), clearBtn = $("wb-persona-clear");
+    var sameBtn = $("wb-same-filter");
     if (!state.persona) {
       title.innerHTML = "公开浏览模式<span>尚未关联人格测试结果</span>";
       bars.innerHTML = "";
+      if (face) { face.innerHTML = ""; face.hidden = true; }
       note.innerHTML = "完成 28 题测试后，本页会按你的四维偏好计算筛选分并排序。" +
         '<a href="index.html">去做测试</a>，或从下拉任选一种人格查看。';
       sel.value = "";
       filterBtn.disabled = true; clearBtn.disabled = true;
+      if (sameBtn) { sameBtn.disabled = true; sameBtn.classList.remove("is-on"); }
       filterBtn.classList.remove("is-on");
       return;
     }
     var p = state.persona;
     title.innerHTML = escapeHtml(p.name) + "<span>" + p.code + " · " +
       escapeHtml(STYLE_NAME[p.style] || "--") + " · " + escapeHtml(p.source) + "</span>";
+    if (face) {
+      var fig = window.GBTI_LOOK ? window.GBTI_LOOK.figure(p.code) : "";
+      face.innerHTML = fig || "";
+      face.hidden = !fig;
+    }
     if (p.scores) {
       bars.innerHTML = DIMENSIONS.map(function (d) {
-        return '<span class="wb-bar">' + escapeHtml(d.name) + " <b>" +
-          escapeHtml(d.leftName) + " " + p.scores[d.left] + " : " + p.scores[d.right] + " " +
-          escapeHtml(d.rightName) + "</b></span>";
+        var l = Number(p.scores[d.left]) || 0;
+        var r = Number(p.scores[d.right]) || 0;
+        var total = l + r || 1;
+        var lw = Math.round(l / total * 100);
+        return '<div class="gb-axis">' +
+          '<div class="gb-axis-head"><span>' + escapeHtml(d.leftName) + " <b>" + l + "</b></span>" +
+          '<span class="gb-axis-r"><b>' + r + "</b> " + escapeHtml(d.rightName) + "</span></div>" +
+          '<span class="gb-axis-track"><i class="gb-axis-l-fill" style="width:' + lw + '%"></i>' +
+          '<i class="gb-axis-r-fill" style="width:' + (100 - lw) + '%"></i></span></div>';
       }).join("");
     } else {
-      bars.innerHTML = '<span class="wb-bar">仅有四码，未提供逐题作答，四维得分不显示。</span>';
+      /* 只有四码时给四维字母胶囊，比一行占位文字有信息量。 */
+      bars.innerHTML = '<div class="gb-codebox"><div class="gb-codechips">' + DIMENSIONS.map(function (d, i) {
+        var letter = String(p.code || "").charAt(i);
+        var name = letter === d.left ? d.leftName : d.rightName;
+        return '<span class="gb-codechip"><b>' + escapeHtml(letter) + "</b>" + escapeHtml(name) + "</span>";
+      }).join("") + "</div></div>";
     }
-    note.innerHTML = "筛选分与风格命中随人格实时重算。点按我的风格筛一遍，只看归入当前风格桶的标的；条件可随时清除。";
+    var sameCount = state.rows.filter(function (r) { return r.personaCode === p.code; }).length;
+    note.innerHTML = "筛选分与风格命中随人格实时重算。点按我的风格筛一遍，只看归入当前风格桶的标的；" +
+      "点找出和我同人格的标的，只看四维代码与你完全相同的标的（当前 " + sameCount +
+      " 只）。股票人格由当日行情按公开阈值判定，规则见页脚公示。条件可随时清除。";
     sel.value = p.code;
     filterBtn.disabled = false; clearBtn.disabled = state.cleared;
     filterBtn.classList.toggle("is-on", state.styleFilterOn);
+    if (sameBtn) {
+      sameBtn.disabled = false;
+      sameBtn.classList.toggle("is-on", state.sameOnly);
+      sameBtn.textContent = state.sameOnly ? "只看同类（已开）· " + sameCount + " 只" : "找出和我同人格的标的";
+    }
   }
 
   function medianOf(rows, getter) {
@@ -273,9 +329,12 @@
     var scorable = state.rows.filter(function (r) { return r.group !== "fund"; });
     var hit = scorable.filter(function (r) { return r.hit; });
     var pct = scorable.length ? (hit.length / scorable.length * 100).toFixed(1) : "--";
+    var sameOf = scorable.filter(function (r) { return r.personaCode === state.persona.code; });
+    var samePct = scorable.length ? (sameOf.length / scorable.length * 100).toFixed(1) : "--";
     var cells = [
       ["归入当前风格桶", hit.length + " 只", "可评分标的共 " + scorable.length + " 只"],
       ["占可评分标的", pct + "%", "按当前风格标签统计"],
+      ["与你同人格", sameOf.length + " 只", "四维代码同为 " + state.persona.code + "，占 " + samePct + "%"],
       ["中位市盈率", fmt(medianOf(hit, peOf), 1) + " / " + fmt(medianOf(scorable, peOf), 1), "命中组 / 全池（倍）"],
       ["中位换手率", fmt(medianOf(hit, toOf), 2) + "% / " + fmt(medianOf(scorable, toOf), 2) + "%", "命中组 / 全池"]
     ];
@@ -330,11 +389,13 @@
       mcapMin: numberValue("wb-mcap-min"), amountMin: numberValue("wb-amount-min"),
       turnoverMin: numberValue("wb-turnover-min"), turnoverMax: numberValue("wb-turnover-max"),
       chg: $("wb-chg").value,
-      favOnly: $("wb-fav-only").checked
+      favOnly: $("wb-fav-only").checked,
+      sameOnly: state.sameOnly
     };
   }
   function pass(row, f) {
     if (f.search && (row.code + " " + row.name).toLowerCase().indexOf(f.search) === -1) return false;
+    if (f.sameOnly && (!state.persona || row.personaCode !== state.persona.code)) return false;
     if (f.group && row.group !== f.group) return false;
     if (f.index && row.indexes.indexOf(f.index) === -1) return false;
     if (f.style && row.styles.indexOf(f.style) === -1) return false;
@@ -362,6 +423,7 @@
     if (key === "score") return row.score;
     if (key === "styles") return row.styles.length;
     if (key === "code" || key === "name" || key === "groupName" || key === "belong") return row[key];
+    if (key === "personaCode") return row.personaCode || null;
     return row.quote ? row.quote[key] : null;
   }
   function sortRows(rows) {
@@ -401,6 +463,15 @@
       return '<span class="' + cls + '">' + (STYLE_NAME[s] || s) + "</span>";
     }).join("");
   }
+  function personaCell(row) {
+    if (!row.personaCode) return '<span class="wb-muted">--</span>';
+    var same = state.persona && row.personaCode === state.persona.code;
+    var tip = (row.personaName || "") + " · 代码 " + row.personaCode + " · 点击查看人格卡";
+    var head = window.GBTI_LOOK ? window.GBTI_LOOK.avatar(row.personaCode, 16) : "";
+    return '<button type="button" class="wb-ptag' + (same ? " is-same" : "") + '" data-card="' + escapeHtml(row.code) +
+      '" title="' + escapeHtml(tip) + '">' + head +
+      escapeHtml(row.personaCode) + "<i>" + escapeHtml(row.personaName || "") + "</i></button>";
+  }
   function cellHtml(row, col) {
     var q = row.quote || {};
     switch (col.kind) {
@@ -419,6 +490,7 @@
       case "pe": return peCell(q.pe);
       case "chg": return chgCell(q.chgPct);
       case "styles": return stylesCell(row);
+      case "persona": return personaCell(row);
       default: return "";
     }
   }
@@ -431,19 +503,57 @@
       return '<th data-sort="' + col.sort + '">' + col.label + mark + "</th>";
     }).join("");
   }
+  function pageCount(total) {
+    return Math.max(1, Math.ceil(total / PAGE_SIZE));
+  }
+  /* 只重画当前页；排序、筛选、清空条件时先把页码归位到第 1 页，收藏与对比不动页码。 */
   function render() {
     computeIfNeeded();
     var f = currentFilters();
     state.view = sortRows(state.rows.filter(function (row) { return pass(row, f); }));
     renderHead();
-    $("wb-body").innerHTML = state.view.map(function (row) {
+    var total = state.view.length;
+    var pages = pageCount(total);
+    if (state.page > pages) state.page = pages;
+    if (state.page < 1) state.page = 1;
+    var start = (state.page - 1) * PAGE_SIZE;
+    var slice = state.view.slice(start, start + PAGE_SIZE);
+    $("wb-body").innerHTML = slice.map(function (row) {
       var cls = state.persona && row.hit ? ' class="wb-hit"' : "";
       return "<tr" + cls + ">" + COLUMNS.map(function (col) { return "<td>" + cellHtml(row, col) + "</td>"; }).join("") + "</tr>";
     }).join("");
-    $("wb-empty").hidden = state.view.length > 0;
-    $("wb-count").textContent = "筛选结果 " + state.view.length + " 只 / 全池 " + state.rows.length + " 只";
+    $("wb-empty").hidden = total > 0;
+    $("wb-count").textContent = "筛选结果 " + total + " 只 / 全池 " + state.rows.length + " 只";
     $("wb-style-filter").classList.toggle("is-on", state.styleFilterOn);
+    renderPager(total, pages);
     renderCompare();
+  }
+  function renderPager(total, pages) {
+    var pager = $("wb-pager");
+    if (!pager) return;
+    pager.hidden = total === 0;
+    var from = total ? (state.page - 1) * PAGE_SIZE + 1 : 0;
+    var to = Math.min(total, state.page * PAGE_SIZE);
+    $("wb-page-info").textContent = total
+      ? "第 " + from + "–" + to + " 只，共 " + total + " 只 · 第 " + state.page + " / " + pages + " 页"
+      : "没有符合条件的标的";
+    $("wb-page-prev").disabled = state.page <= 1;
+    $("wb-page-next").disabled = state.page >= pages;
+    var jump = $("wb-page-input");
+    if (jump) {
+      jump.setAttribute("max", String(pages));
+      /* 只在用户没在输入时才写回，避免边输入边被覆盖。 */
+      if (document.activeElement !== jump) jump.value = String(state.page);
+    }
+  }
+  function goPage(n) {
+    var pages = pageCount(state.view.length);
+    var next = Math.min(pages, Math.max(1, n));
+    if (next === state.page) { renderPager(state.view.length, pages); return; }
+    state.page = next;
+    render();
+    var table = $("wb-table");
+    if (table && table.scrollIntoView) table.scrollIntoView({ block: "start", behavior: "smooth" });
   }
   function renderCompare() {
     var box = $("wb-compare");
@@ -501,13 +611,14 @@
     if (f.turnoverMax !== null) parts.push("换手上限=" + f.turnoverMax);
     if (f.chg) parts.push("涨跌=" + f.chg);
     if (f.favOnly) parts.push("只看收藏");
+    if (f.sameOnly) parts.push("只看与我同人格（" + (state.persona ? state.persona.code : "--") + "）");
     return parts.length ? parts.join("; ") : "无条件";
   }
   function exportCsv() {
     if (!state.view.length) return;
     var f = currentFilters();
     var header = ["代码", "名称", "标的来源", "行业", "指数成分", "收盘价", "涨跌幅(%)", "成交额(亿元)",
-      "换手率(%)", "市盈率", "市盈率历史分位(%)", "市净率", "总市值(亿元)", "风格标签", "风格来源",
+      "换手率(%)", "市盈率", "市盈率历史分位(%)", "市净率", "总市值(亿元)", "股票人格", "股票人格名称", "风格标签", "风格来源",
       "人格代码", "筛选分", "风格分项", "估值分项", "流动性分项", "风格命中", "当前筛选条件",
       "行情日期", "行情截止日", "数据来源"];
     var lines = [header.join(",")];
@@ -523,6 +634,8 @@
         isNum(q.pePct) ? q.pePct.toFixed(2) : "",
         isNum(q.pb) ? q.pb.toFixed(2) : "",
         isNum(q.mcapYi) ? q.mcapYi.toFixed(2) : "",
+        r.personaCode || "",
+        r.personaName || "",
         r.styles.map(function (s) { return STYLE_NAME[s] || s; }).join(" "),
         r.styleSource,
         state.persona ? state.persona.code : "",
@@ -547,18 +660,78 @@
   }
 
   /* ---------- 事件 ---------- */
+  /* ---------- 配对玩法：相亲卡 / 组合体检 / 反向榜 ---------- */
+  function matchStockOf(row) {
+    return {
+      code: row.code, name: row.name,
+      industry: row.industry || "", belong: row.belong || "",
+      personaCode: row.personaCode, personaName: row.personaName,
+      asOf: MARKET ? MARKET.asOf : ""
+    };
+  }
+  function meForMatch() {
+    return state.persona ? { code: state.persona.code, name: state.persona.name } : null;
+  }
+  function matchReady() {
+    return Boolean(window.GBTI_MATCH);
+  }
+  function openMatchCard(code) {
+    if (!matchReady()) return;
+    var row = state.rows.filter(function (r) { return r.code === code; })[0];
+    if (!row || !row.personaCode) return;
+    window.GBTI_MATCH.openCard(matchStockOf(row), meForMatch());
+  }
+  function bindMatch() {
+    var combo = $("wb-match-combo");
+    if (combo) combo.addEventListener("click", function () {
+      if (!state.persona) { window.alert("先完成 28 题测试，或在下拉里选一个人格，再玩配对。"); return; }
+      var favs = state.rows.filter(function (r) { return state.favs.has(r.code) && r.personaCode && r.group !== "fund"; });
+      if (favs.length < 3) {
+        window.alert("先在表格里星标至少 3 只标的，组合体检才有意义。当前收藏 " + favs.length + " 只。");
+        return;
+      }
+      window.GBTI_MATCH.openCombo(favs.slice(0, 8).map(matchStockOf), meForMatch());
+    });
+    var reverse = $("wb-match-reverse");
+    if (reverse) reverse.addEventListener("click", function () {
+      if (!state.persona) { window.alert("先完成 28 题测试，或在下拉里选一个人格，再玩配对。"); return; }
+      var pool = state.rows.filter(function (r) { return r.personaCode && r.group !== "fund"; });
+      window.GBTI_MATCH.openReverse(pool.map(matchStockOf), meForMatch());
+    });
+    var random = $("wb-match-random");
+    if (random) random.addEventListener("click", function () {
+      var pool = state.rows.filter(function (r) { return r.personaCode && r.group !== "fund"; });
+      if (!pool.length) return;
+      var pick = pool[Math.floor(Math.random() * pool.length)];
+      openMatchCard(pick.code);
+    });
+  }
+
   function bind() {
     var ids = ["wb-search", "wb-group", "wb-index", "wb-style", "wb-pe-min", "wb-pe-max",
       "wb-mcap-min", "wb-amount-min", "wb-turnover-min", "wb-turnover-max", "wb-chg", "wb-fav-only"];
     ids.forEach(function (id) {
       var el = $(id);
-      el.addEventListener(el.tagName === "SELECT" || el.type === "checkbox" ? "change" : "input", render);
+      el.addEventListener(el.tagName === "SELECT" || el.type === "checkbox" ? "change" : "input", function () {
+        /* 条件一变，结果集就换了，页码回到第一页。 */
+        state.page = 1;
+        render();
+      });
+    });
+
+    $("wb-page-prev").addEventListener("click", function () { goPage(state.page - 1); });
+    $("wb-page-next").addEventListener("click", function () { goPage(state.page + 1); });
+    $("wb-page-input").addEventListener("change", function () {
+      var n = parseInt(this.value, 10);
+      if (isNaN(n)) { renderPager(state.view.length, pageCount(state.view.length)); return; }
+      goPage(n);
     });
 
     $("wb-code").addEventListener("change", function () {
       var code = this.value;
       state.cleared = false;
       state.styleFilterOn = false;
+      state.sameOnly = false;
       $("wb-style").value = "";
       if (!code) {
         state.cleared = true;
@@ -568,15 +741,32 @@
         state.persona = personaFromCode(code, same ? state.answerScores : null,
           same ? "本机答题记录" : "手动切换（未提供逐题作答）");
       }
+      state.page = 1;
       refreshAll();
     });
 
     $("wb-style-filter").addEventListener("click", function () {
       if (!state.persona) return;
       state.styleFilterOn = !state.styleFilterOn;
+      if (state.styleFilterOn) state.sameOnly = false;
       $("wb-style").value = state.styleFilterOn ? state.persona.style : "";
       state.sortKey = "score";
       state.sortDir = -1;
+      state.page = 1;
+      refreshAll();
+    });
+
+    // 股票人格视图：只看与自己四维代码相同的标的，与风格筛选互斥。
+    $("wb-same-filter").addEventListener("click", function () {
+      if (!state.persona) return;
+      state.sameOnly = !state.sameOnly;
+      if (state.sameOnly) {
+        state.styleFilterOn = false;
+        $("wb-style").value = "";
+      }
+      state.sortKey = "score";
+      state.sortDir = -1;
+      state.page = 1;
       refreshAll();
     });
 
@@ -584,7 +774,9 @@
       state.cleared = true;
       state.persona = null;
       state.styleFilterOn = false;
+      state.sameOnly = false;
       $("wb-style").value = "";
+      state.page = 1;
       refreshAll();
     });
 
@@ -594,10 +786,14 @@
       var key = th.getAttribute("data-sort");
       if (state.sortKey === key) state.sortDir = -state.sortDir;
       else { state.sortKey = key; state.sortDir = 1; }
+      /* 换排序方式后，第一页的内容已经不同，回到第一页看新的头部。 */
+      state.page = 1;
       render();
     });
 
     $("wb-body").addEventListener("click", function (e) {
+      var tag = e.target.closest(".wb-ptag[data-card]");
+      if (tag) { openMatchCard(tag.getAttribute("data-card")); return; }
       var btn = e.target.closest("button[data-fav]");
       if (!btn) return;
       var code = btn.getAttribute("data-fav");
@@ -625,6 +821,10 @@
     });
 
     $("wb-export").addEventListener("click", exportCsv);
+    window.addEventListener("gbti-theme-change", function () {
+      renderPersona();
+      render();
+    });
     $("wb-reset").addEventListener("click", function () {
       ids.forEach(function (id) {
         var el = $(id);
@@ -633,14 +833,18 @@
         else el.value = "";
       });
       state.styleFilterOn = false;
-      render();
+      state.sameOnly = false;
+      state.page = 1;
+      refreshAll();
     });
   }
 
   /* ---------- 启动 ---------- */
   state.rows = buildRows();
+  annotateStockPersona();
   resolvePersona();
   setupSelects();
   bind();
+  bindMatch();
   refreshAll();
 })();

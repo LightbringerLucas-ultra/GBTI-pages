@@ -143,6 +143,45 @@
     return out;
   }
 
+  /* ---------- 股票人格：把四位代码的判定搬到标的上 ----------
+     四个维度各取一个当日行情字段，阈值取全池当期中位数，规则随快照变化，
+     页面公示里写明这一点。用途是与使用者的人格做趣味对照，不是对标的的评价。 */
+
+  function stockMedian(values) {
+    const a = values.filter(function (v) { return typeof v === "number" && !isNaN(v); })
+      .sort(function (x, y) { return x - y; });
+    if (!a.length) return null;
+    const m = Math.floor(a.length / 2);
+    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+  }
+
+  function stockThresholds(quotes) {
+    const list = quotes ? Object.keys(quotes).map(function (k) { return quotes[k]; }) : [];
+    return {
+      pe: stockMedian(list.map(function (q) { return q && typeof q.pe === "number" && q.pe > 0 ? q.pe : null; })),
+      turnover: stockMedian(list.map(function (q) { return q ? q.turnover : null; })),
+      mcapYi: stockMedian(list.map(function (q) { return q ? q.mcapYi : null; })),
+      amplitude: stockMedian(list.map(function (q) { return q ? q.amplitude : null; }))
+    };
+  }
+
+  function stockPersonalityOf(quote, t) {
+    if (!quote || !t) return null;
+    const num = function (v) { return typeof v === "number" && !isNaN(v); };
+    // 信息依据：市盈率为正且不高于全池正值中位数，视为盈利可测算。
+    const basis = (num(quote.pe) && quote.pe > 0 && t.pe !== null && quote.pe <= t.pe) ? "F" : "M";
+    // 持有周期：换手率不高于全池中位数，视为换手安静、拿得住。
+    const term = (num(quote.turnover) && t.turnover !== null && quote.turnover <= t.turnover) ? "L" : "S";
+    // 风险偏好：总市值不低于全池中位数，视为体量大、起伏相对小。
+    const risk = (num(quote.mcapYi) && t.mcapYi !== null && quote.mcapYi >= t.mcapYi) ? "D" : "A";
+    // 决策方式：当日振幅不高于全池中位数，视为走势平稳、可依规则跟踪。
+    const decision = (num(quote.amplitude) && t.amplitude !== null && quote.amplitude <= t.amplitude) ? "O" : "J";
+    return {
+      code: basis + term + risk + decision,
+      basis: basis, term: term, risk: risk, decision: decision
+    };
+  }
+
   function scoreStock(item, quote, ctx) {
     const pePct = quote && typeof quote.pePct === "number" ? quote.pePct : null;
     const peAbs = quote && typeof quote.pe === "number" ? quote.pe : null;
@@ -387,7 +426,10 @@
     allocationFor: allocationFor,
     withOffset: withOffset,
     buildPlan: buildPlan,
-    _internal: { scoreStock: scoreStock, turnoverFit: turnoverFit, pickStocks: pickStocks, deriveStyles: deriveStyles }
+    stockPersonalityOf: stockPersonalityOf,
+    stockThresholds: stockThresholds,
+    _internal: { scoreStock: scoreStock, turnoverFit: turnoverFit, pickStocks: pickStocks, deriveStyles: deriveStyles,
+      stockPersonalityOf: stockPersonalityOf, stockThresholds: stockThresholds, stockMedian: stockMedian }
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = API;

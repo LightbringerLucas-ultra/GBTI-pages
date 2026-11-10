@@ -53,16 +53,37 @@ html[data-theme="qingming"] {
 }
 
 /* ---------- 人格条 ---------- */
+/* 人物图与右侧内容等高：图占左栏整条，右侧内容纵向铺满，避免图旁边空一大片。 */
+.hs-persona-main { display: flex; gap: 18px; align-items: stretch; }
+.hs-persona-face { width: 120px; flex: none; display: flex; }
+.hs-persona-face[hidden] { display: none; }
+/* 图按 3:4 原比例铺满左栏高度，宽度固定，超出部分居中裁切。 */
+.hs-persona-face .gb-figure { width: 100%; aspect-ratio: auto; align-self: stretch; border-radius: 12px; }
+.hs-persona-copy { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .hs-persona-title { font-size: 15px; font-weight: 700; color: var(--ink-strong); }
 .hs-persona-title span { font-weight: 400; color: var(--muted); font-size: 12.5px; margin-left: 8px; }
-.hs-persona-bars { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+/* 四维排成两列，把右侧宽度用起来，也不再拉出过长的一列。 */
+.hs-persona-bars { margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 20px; }
+
+
+/* 曲线关键指标：四个大数字，先给结论感 */
+.hs-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.hs-stat { padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-muted); }
+.hs-stat span { display: block; font-size: 11.5px; color: var(--muted); margin-bottom: 5px; }
+.hs-stat b {
+  display: flex; align-items: baseline; gap: 2px;
+  font-size: 25px; font-weight: 700; color: var(--ink-strong);
+  font-variant-numeric: tabular-nums;
+}
+.hs-stat b em { font-style: normal; }
+.hs-stat b i { font-style: normal; font-size: 12px; color: var(--muted); }
 .hs-bar {
   font-size: 11.5px; color: var(--muted);
   padding: 3px 9px; border-radius: var(--radius-pill, 999px);
   background: var(--surface-muted); border: 1px solid var(--line);
 }
 .hs-bar b { color: var(--ink); font-weight: 700; }
-.hs-persona-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-top: 16px; }
+.hs-persona-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-top: auto; padding-top: 16px; }
 .hs-switch { min-width: 210px; }
 .hs-switch select { background: var(--surface); }
 .hs-persona-note { margin: 0; padding-bottom: 8px; }
@@ -146,4 +167,12 @@ html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
   .hs-tip-date { font-size: 12px; }
   .hs-tip-name { font-size: 11px; }
   .hs-tip-meta { font-size: 10px; }
+  .hs-persona-main { gap: 12px; }
+  .hs-persona-face { width: 76px; }
+  /* 窄屏放不下两列四维，退回单列。 */
+  .hs-persona-bars { grid-template-columns: 1fr; gap: 8px; }
+  .gb-codechips { gap: 6px; }
+  .gb-codechip { padding: 4px 10px; font-size: 12px; }
+  .hs-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hs-stat b { font-size: 21px; }
 }

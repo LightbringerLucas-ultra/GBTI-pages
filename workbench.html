@@ -8,14 +8,19 @@
   <script src="theme-sync.js"></script>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="subpage.css">
-  <link rel="stylesheet" href="workbench.css">
+  <link rel="stylesheet" href="workbench.css?v=stock-persona">
+  <link rel="stylesheet" href="polish.css">
+  <link rel="stylesheet" href="match.css">
   <script src="questions.js" defer></script>
   <script src="scoring.js" defer></script>
+  <script src="characters.js" defer></script>
+  <script src="polish.js" defer></script>
   <script src="pool.js" defer></script>
   <script src="pool-index.js" defer></script>
   <script src="market-data.js" defer></script>
-  <script src="allocation.js" defer></script>
-  <script src="workbench.js" defer></script>
+  <script src="allocation.js?v=stock-persona" defer></script>
+  <script src="stock-match.js" defer></script>
+  <script src="workbench.js?v=stock-persona" defer></script>
 </head>
 <body>
   <div class="sp-shell">
@@ -24,6 +29,7 @@
       <a class="sp-brand" href="index.html"><span class="sp-brand-mark">G</span><span class="sp-brand-name">GBTI V10</span></a>
       <nav class="sp-nav" aria-label="页面导航">
         <a href="index.html">人格测试</a>
+        <a href="index.html?section=plan">资产配置建议</a>
         <a href="workbench.html" class="is-current">筛选工作台</a>
         <a href="history.html">历史起伏</a>
       </nav>
@@ -49,6 +55,7 @@
 
     <section id="wb-persona" class="sp-card sp-accent wb-persona" aria-label="人格视图">
       <div class="wb-persona-main">
+        <div id="wb-persona-face" class="wb-persona-face" aria-hidden="true" hidden></div>
         <div>
           <div id="wb-persona-title" class="wb-persona-title"></div>
           <div id="wb-persona-bars" class="wb-persona-bars"></div>
@@ -57,9 +64,17 @@
       <div class="wb-persona-actions">
         <label class="sp-field wb-persona-switch"><span>换个人格看看</span><select id="wb-code" class="sp-select"></select></label>
         <button id="wb-style-filter" class="sp-btn wb-btn" type="button">按我的风格筛一遍</button>
+        <button id="wb-same-filter" class="sp-btn wb-btn" type="button">找出和我同人格的标的</button>
         <button id="wb-persona-clear" class="sp-btn sp-btn-ghost wb-btn" type="button">清除人格视图</button>
       </div>
       <p id="wb-persona-note" class="sp-note wb-persona-note"></p>
+      <div class="wb-match-bar" aria-label="配对玩法">
+        <span class="wb-match-label">配对玩法</span>
+        <button id="wb-match-combo" class="sp-btn sp-btn-ghost wb-btn" type="button">组合体检</button>
+        <button id="wb-match-reverse" class="sp-btn sp-btn-ghost wb-btn" type="button">最不像我的 5 只</button>
+        <button id="wb-match-random" class="sp-btn sp-btn-ghost wb-btn" type="button">随便抽一只</button>
+        <span class="wb-match-hint">点表格里的股票人格标签，看单只的人格卡</span>
+      </div>
     </section>
 
     <section id="wb-insight" class="sp-card wb-insight" hidden aria-label="风格分布"></section>
@@ -91,7 +106,7 @@
           <button id="wb-reset" class="sp-btn sp-btn-ghost wb-btn" type="button">清空条件</button>
         </div>
       </div>
-      <p class="sp-note">点表头可排序，再次点击切换升降。勾选行首方框可加入对比，最多 3 只；星标收藏保存在本机浏览器。</p>
+      <p class="sp-note">点表头可排序，再次点击切换升降。勾选行首方框可加入对比，最多 3 只；星标收藏保存在本机浏览器。股票人格列是把测人的四维规则搬到标的上，用来找同类，不是对标的的评价。</p>
       <div class="sp-table-wrap wb-table-wrap">
         <table id="wb-table" class="sp-table wb-table">
           <thead><tr id="wb-head-row"></tr></thead>
@@ -99,6 +114,12 @@
         </table>
       </div>
       <p id="wb-empty" class="sp-note wb-empty" hidden>当前条件下没有符合条件的标的。放宽数值条件或清空条件即可。</p>
+      <nav id="wb-pager" class="wb-pager" aria-label="表格分页">
+        <button id="wb-page-prev" class="sp-btn sp-btn-ghost wb-page-btn" type="button">← 上一页</button>
+        <span id="wb-page-info" class="wb-page-info" role="status"></span>
+        <button id="wb-page-next" class="sp-btn sp-btn-ghost wb-page-btn" type="button">下一页 →</button>
+        <label class="wb-page-jump"><span>跳到</span><input id="wb-page-input" class="wb-page-input" type="number" min="1" step="1" inputmode="numeric" aria-label="跳转页码"><span>页</span></label>
+      </nav>
     </section>
 
     <section id="wb-compare" class="sp-card wb-compare" hidden aria-label="标的对比">

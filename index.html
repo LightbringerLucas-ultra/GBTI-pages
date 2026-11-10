@@ -19,6 +19,8 @@
     })();
   </script>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="polish.css">
+  <link rel="stylesheet" href="market-mood.css">
   <link rel="stylesheet" href="metaphysics.css">
   <link rel="stylesheet" href="tarot.css">
   <link rel="stylesheet" href="news.css">
@@ -32,7 +34,7 @@
   <script src="pool.js" defer></script>
   <script src="pool-index.js" defer></script>
   <script src="market-data.js" defer></script>
-  <script src="allocation.js" defer></script>
+  <script src="allocation.js?v=stock-persona" defer></script>
   <script src="plan.js" defer></script>
   <script src="ai.js" defer></script>
   <script src="update.js" defer></script>
@@ -47,6 +49,7 @@
   <!-- 塔罗映照模块（纯新增）：依赖 metaphysics.js 暴露的 GBTI_XUANXUE.readingFor 做东西合参 -->
   <script src="tarot.js" defer></script>
   <script src="result-pages.js" defer></script>
+  <script src="market-mood.js" defer></script>
 </head>
 <body>
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -57,8 +60,6 @@
       <a class="brand" href="#top" aria-label="GBTI 首页">GBTI<span> / 股票人格</span></a>
       <nav class="topnav" aria-label="页面导航">
         <a href="#personality-gallery">16 种人格</a>
-        <a href="workbench.html">筛选工作台</a>
-        <a href="history.html">历史起伏</a>
         <button id="open-ai" class="topnav-ai" type="button">AI 助手</button>
       </nav>
       <div class="topbar-actions">
@@ -102,6 +103,19 @@
 
   <main id="top" class="shell">
     <div class="shell-main">
+
+      <section id="market-mood" class="mm" aria-label="市场牛熊与市场人格" hidden>
+        <button id="mm-open" class="mm-band" type="button" aria-haspopup="dialog">
+          <img id="mm-thumb" class="mm-thumb" alt="" width="946" height="946" decoding="async">
+          <span class="mm-band-main">
+            <span class="mm-kicker">市场牛熊 · <i id="mm-date"></i></span>
+            <strong id="mm-name" class="mm-name"></strong>
+            <span id="mm-stats" class="mm-stats"></span>
+          </span>
+          <span id="mm-side" class="mm-side"></span>
+          <span class="mm-arrow" aria-hidden="true">查看详情 →</span>
+        </button>
+      </section>
 
       <section id="quiz-heading" class="intro landing-hero" aria-labelledby="landing-title">
         <h1 id="landing-title" class="vh">找到你的投资人格</h1>
@@ -238,6 +252,8 @@
               </div>
             </div>
             <div class="plan-actions">
+              <a id="plan-workbench" class="pill-button" href="workbench.html">筛选工作台</a>
+              <a id="plan-history" class="pill-button" href="history.html">历史起伏</a>
               <button id="plan-copy" class="pill-button" type="button">复制整套方案</button>
               <button id="plan-ask" class="pill-button" type="button">问 AI 为什么这样配</button>
               <button id="plan-reset" class="pill-button" type="button" hidden>清除我的调整</button>
@@ -299,8 +315,6 @@
                   <button class="seg-btn" type="button" data-sort="amount" aria-pressed="false">按成交额</button>
                 </div>
                 <button id="plan-expand" class="pill-button" type="button" aria-pressed="false">展开全部理由</button>
-                <a id="plan-workbench" class="pill-button" href="workbench.html">在全池中查看</a>
-                <a id="plan-history" class="pill-button" href="history.html">看这类风格的历史起伏</a>
               </div>
             </div>
             <p class="hint" id="plan-stocks-lead"></p>
@@ -411,7 +425,6 @@
       <footer>
         <p>GBTI V10 · 趣味自我探索 · 非科学测评 · 不构成投资建议</p>
         <p>答题进度保存在浏览器里，随时可清空；使用第三方 AI 服务会发送相关上下文。</p>
-        <p><a href="workbench.html">标的筛选工作台</a> · <a href="history.html">历史起伏</a></p>
         <button id="donate-open" class="donate-btn" type="button" data-donate-open>☕ 打赏作者</button>
       </footer>
 
@@ -606,6 +619,16 @@
         <button id="disclaimer-accept" class="disclaimer-accept" type="button">我已认真阅读</button>
       </footer>
     </div>
+  </dialog>
+  <dialog id="mm-dialog" class="modal mm-modal" aria-labelledby="mm-dialog-title">
+    <div class="mm-dialog-head">
+      <div>
+        <h2 id="mm-dialog-title">市场牛熊与市场人格</h2>
+        <p>查看行情快照中的涨跌分布与四维特征</p>
+      </div>
+      <button id="mm-close" class="icon-button" type="button" aria-label="关闭">✕</button>
+    </div>
+    <div id="mm-dialog-body" class="mm-body"></div>
   </dialog>
   <script src="disclaimer.js"></script>
 </body>

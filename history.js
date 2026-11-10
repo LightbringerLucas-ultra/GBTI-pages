@@ -158,6 +158,8 @@
     if (!state.persona) {
       title.innerHTML = "公开浏览模式<span>尚未关联人格测试结果</span>";
       bars.innerHTML = "";
+      var face0 = $("hs-persona-face");
+      if (face0) { face0.innerHTML = ""; face0.hidden = true; }
       note.textContent = "完成 28 题测试后，本页会按你的风格桶与持有周期展示对应曲线；也可直接下拉选一种人格。";
       sel.value = "";
       return;
@@ -165,13 +167,30 @@
     var p = state.persona;
     title.innerHTML = escapeHtml(p.name) + "<span>" + p.code + " · " +
       escapeHtml(STYLE_NAME[p.style] || "--") + " · " + escapeHtml(p.source) + "</span>";
+    var face = $("hs-persona-face");
+    if (face) {
+      var fig = window.GBTI_LOOK ? window.GBTI_LOOK.figure(p.code) : "";
+      face.innerHTML = fig || "";
+      face.hidden = !fig;
+    }
     bars.innerHTML = p.scores
       ? DIMENSIONS.map(function (d) {
-          return '<span class="hs-bar">' + escapeHtml(d.name) + " <b>" +
-            escapeHtml(d.leftName) + " " + p.scores[d.left] + " : " + p.scores[d.right] + " " +
-            escapeHtml(d.rightName) + "</b></span>";
+          var l = Number(p.scores[d.left]) || 0;
+          var r = Number(p.scores[d.right]) || 0;
+          var total = l + r || 1;
+          var lw = Math.round(l / total * 100);
+          return '<div class="gb-axis">' +
+            '<div class="gb-axis-head"><span>' + escapeHtml(d.leftName) + " <b>" + l + "</b></span>" +
+            '<span class="gb-axis-r"><b>' + r + "</b> " + escapeHtml(d.rightName) + "</span></div>" +
+            '<span class="gb-axis-track"><i class="gb-axis-l-fill" style="width:' + lw + '%"></i>' +
+            '<i class="gb-axis-r-fill" style="width:' + (100 - lw) + '%"></i></span></div>';
         }).join("")
-      : '<span class="hs-bar">仅有四码，未提供逐题作答，四维得分不显示。</span>';
+      : '<div class="gb-codebox"><div class="gb-codechips">' + DIMENSIONS.map(function (d, i) {
+          var letter = String(p.code || "").charAt(i);
+          var name = letter === d.left ? d.leftName : d.rightName;
+          return '<span class="gb-codechip"><b>' + escapeHtml(letter) + "</b>" + escapeHtml(name) + "</span>";
+        }).join("") + '</div>' +
+        '<p class="gb-codehint">四码来自网址，没有逐题作答，故不显示四维得分。</p></div>';
     note.textContent = p.decide === "O"
       ? "你更依赖预设标准，下方数值表列出全部指标，便于逐项核对。"
       : "你更依赖情境综合判断，可先看曲线整体形状，再回看数值。";
@@ -484,6 +503,35 @@
         '</td><td class="hs-num">' + fmt(m.maxDD, 2) + '</td><td class="hs-num">' + fmt(m.vol, 2) +
         '</td><td class="hs-num">' + fmt(m.amp, 2) + '</td><td class="hs-num">' + fmt(m.downPct, 1) + "</td></tr>";
     }).join("");
+    renderSummary(curves, cur);
+  }
+
+  /* 曲线顶部的四个大数字：先给结论感，再看下方明细表。 */
+  function renderSummary(curves, cur) {
+    var box = $("hs-summary");
+    if (!box) return;
+    var c = curves.filter(function (x) { return x.code === cur; })[0] || curves[0];
+    if (!c) { box.innerHTML = ""; return; }
+    var m = c.metrics;
+    var cells = [
+      ["最大回撤", m.maxDD, 2],
+      ["年化波动率", m.vol, 2],
+      ["区间振幅", m.amp, 2],
+      ["下跌交易日", m.downPct, 1]
+    ];
+    box.innerHTML = cells.map(function (x, i) {
+      return '<div class="hs-stat"><span>' + x[0] + '</span>' +
+        '<b><em class="hs-stat-num" data-v="' + x[1] + '" data-d="' + x[2] + '">' + fmt(x[1], x[2]) +
+        "</em><i>%</i></b></div>";
+    }).join("");
+    if (window.GBTI_LOOK && window.GBTI_LOOK.countUp) {
+      Array.prototype.forEach.call(box.querySelectorAll(".hs-stat-num"), function (el) {
+        var v = Number(el.getAttribute("data-v"));
+        var d = Number(el.getAttribute("data-d"));
+        if (isNaN(v)) return;
+        window.GBTI_LOOK.countUp(el, v, { digits: d, suffix: "" });
+      });
+    }
   }
   function renderControls(win) {
     var buttons = $("hs-ranges").querySelectorAll("button[data-years]");
@@ -578,6 +626,7 @@
     }
   }
   function onThemeChange() {
+    renderPersona();
     if (!chart || !chart.curves || !chart.curves.length) return;
     chart.curves.forEach(function (c) { c.color = colorFor(c.code); });
     drawChart(chart.curves);

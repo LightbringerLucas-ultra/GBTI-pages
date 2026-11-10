@@ -367,6 +367,7 @@ function showResult() {
   showScores(currentOutcome);
   renderRadar(currentOutcome);
   if (window.GBTI_PLAN) window.GBTI_PLAN.render(currentOutcome);
+  if (window.GBTI_MARKET_MOOD) window.GBTI_MARKET_MOOD.refresh();
   if (window.GBTI_NEWS) window.GBTI_NEWS.render(currentOutcome);
   updateProgressViews();
   renderNavigator();
@@ -654,6 +655,7 @@ function restartQuiz(skipConfirm) {
   generateButton.disabled = false;
   currentIndex = 0; answers = []; moving = false; currentOutcome = null;
   clearProgress();
+  if (window.GBTI_MARKET_MOOD) window.GBTI_MARKET_MOOD.refresh();
   if (typeof reshuffleQuestions === "function") reshuffleQuestions();
   posterImage.removeAttribute("src");
   characterImage.removeAttribute("src");
