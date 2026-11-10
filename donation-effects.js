@@ -229,12 +229,12 @@
     mount();current=event;resize();prepare();soundPlayed=false;
     const stage=root.querySelector('.stage');stage.className='stage';stage.dataset.tier=event.tier.id;stage.style.setProperty('--accent',event.tier.color);
     root.querySelector('.eyebrow').textContent=event.preview?'EFFECT PREVIEW':'THANK YOU FOR YOUR SUPPORT';
-    root.querySelector('.title').textContent=event.preview?event.tier.name+' · 特效预览':'收到一份匿名支持';
+    root.querySelector('.title').textContent=event.preview?event.tier.name+' · 特效预览':event.nickname?'感谢 '+event.nickname+' 的支持':'收到一份匿名支持';
     root.querySelector('.amount b').textContent=core.format(event.amountCents);
     root.querySelector('.caption').textContent=event.preview?'仅试听与预览，不代表实际收款。':event.tier.id==='nova'?'你的支持，让这个小小宇宙继续生长。':event.tier.id==='meteor'?'把这份心意，变成一场流星雨。':'每一份小小心意，都闪闪发光。';
-    root.querySelector('.sr').textContent=(event.preview?'预览':'收到匿名支持')+' '+core.format(event.amountCents)+' 元，'+event.tier.name;
+    root.querySelector('.sr').textContent=(event.preview?'预览':event.nickname?'收到 '+event.nickname+' 的支持':'收到匿名支持')+' '+core.format(event.amountCents)+' 元，'+event.tier.name;
     host.hidden=false;void stage.offsetWidth;stage.classList.add('active');started=performance.now();updateSoundButton();playSound();
-    raf=requestAnimationFrame(frame);dispatch('start',{id:event.id,amountCents:event.amountCents,tier:event.tier.id,preview:Boolean(event.preview)});
+    raf=requestAnimationFrame(frame);dispatch('start',{id:event.id,amountCents:event.amountCents,tier:event.tier.id,nickname:event.nickname||'',intentId:event.intentId||'',preview:Boolean(event.preview)});
   }
   function finish(continueQueue=true) {
     if(!current)return;
@@ -265,9 +265,10 @@
     if(url.protocol!=='https:'&&!(url.protocol==='http:'&&local))return false;
     if(!window.EventSource)return false;
     reconnect={kind:'sse',endpoint};
-    stream=new EventSource(url.href);connection='connecting';
-    stream.addEventListener('open',()=>{connection='connected';dispatch('connection',{state:connection});});
-    stream.addEventListener('error',()=>{connection='reconnecting';dispatch('connection',{state:connection});});
+    stream=new EventSource(url.href);connection='connecting';dispatch('connection',{state:connection,transport:'sse'});
+    stream.addEventListener('open',()=>{connection='connected';dispatch('connection',{state:connection,transport:'sse'});});
+    stream.addEventListener('error',()=>{connection='reconnecting';dispatch('connection',{state:connection,transport:'sse'});});
+    stream.addEventListener('ready',()=>dispatch('ready',{transport:'sse'}));
     stream.addEventListener('receipt',event=>{try{receive(JSON.parse(event.data));}catch(_){}});
     return true;
   }

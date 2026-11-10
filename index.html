@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="style.css?v=20261111-clean-header">
   <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="market-mood.css">
+  <link rel="stylesheet" href="donation-form.css?v=20261111-sse1">
   <link rel="stylesheet" href="metaphysics.css">
   <link rel="stylesheet" href="tarot.css">
   <link rel="stylesheet" href="news.css">
@@ -50,9 +51,10 @@
   <script src="tarot.js" defer></script>
   <script src="result-pages.js?v=plan-data-fold" defer></script>
   <script src="market-mood.js" defer></script>
-  <script src="donation-core.js?v=20261110-1" defer></script>
-  <script src="donation-effects.js?v=20261110-2" defer></script>
-  <script src="donation-cloud.js?v=20261110-2" defer></script>
+  <script src="donation-core.js?v=20261111-sse1" defer></script>
+  <script src="donation-effects.js?v=20261111-sse1" defer></script>
+  <script src="donation-cloud.js?v=20261111-sse1" defer></script>
+  <script src="donation-form.js?v=20261111-sse1" defer></script>
 </head>
 <body>
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -423,27 +425,26 @@
       <div id="donate-modal" class="donate-modal" hidden>
         <div class="donate-backdrop" data-donate-close></div>
         <div class="donate-card" role="dialog" aria-modal="true" aria-label="打赏作者">
-          <img src="assets/donate-qr.jpg?v=621818ec-alipay" alt="支付宝打赏收款二维码">
-          <p class="donate-text">如果这个测试给你带来了快乐，<br>欢迎请作者喝杯咖啡 ☕</p>
-          <button class="donate-close" type="button" data-donate-close>关闭</button>
+          <div class="donation-heading"><h2>给小宇宙一点支持</h2><button class="donation-dismiss" type="button" data-donate-close data-donation-dismiss aria-label="关闭打赏窗口">✕</button></div>
+          <p class="donation-intro">留个昵称，让这一份心意和特效一起出现。</p>
+          <form data-donation-draft>
+            <label class="donation-field">公开昵称（可留空匿名）<input name="nickname" maxlength="20" autocomplete="off" placeholder="怎么称呼你？"></label>
+            <label class="donation-field">选择特效档位<select name="tier"><option value="spark">星光致谢 · ¥0.01–0.09</option><option value="meteor">流星礼花 · ¥0.10–0.99</option><option value="nova">星际庆典 · ¥1.00–1.99</option></select></label>
+            <label class="donation-consent"><input name="publishName" type="checkbox"><span>我同意匹配成功后，在所有正在浏览网站的访客页面展示这个昵称。</span></label>
+            <button class="donation-primary" type="submit" data-donation-action>生成专属金额</button>
+          </form>
+          <section data-donation-reservation hidden>
+            <p>本次请准确支付</p><p class="donation-amount" data-donation-amount></p>
+            <p data-donation-name></p><p class="donation-countdown" data-donation-countdown></p>
+            <button class="donation-primary" type="button" data-donation-confirm data-donation-action>确认金额，显示支付宝收款码</button>
+            <div class="donation-qr" data-donation-qr hidden><img src="assets/donate-qr.jpg?v=621818ec-alipay" alt="支付宝打赏收款二维码"><p class="donation-notice">请在支付宝手动输入上方金额，核对收款人后付款。</p></div>
+            <button class="donation-secondary" type="button" data-donation-renew data-donation-action>取消预留，重新选择</button>
+          </section>
+          <p class="donation-error" role="alert" data-donation-error hidden></p>
+          <p class="donation-notice">专属金额保留 5 分钟。昵称由你填写，按金额尝试配对，并非支付宝实名；通知延迟、付款金额不符或其他同额转账可能导致漏配或误配。联动服务中的配对记录约 24 小时后清理。</p>
+          <p class="donation-connection" data-donation-connection aria-live="polite"></p>
         </div>
       </div>
-      <script>
-      (function () {
-        var modal = document.getElementById("donate-modal");
-        if (!modal) return;
-        function show(value) { modal.hidden = !value; document.body.style.overflow = value ? "hidden" : ""; }
-        document.querySelectorAll("[data-donate-open]").forEach(function (el) {
-          el.addEventListener("click", function () { show(true); });
-        });
-        modal.querySelectorAll("[data-donate-close]").forEach(function (el) {
-          el.addEventListener("click", function () { show(false); });
-        });
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape" && !modal.hidden) show(false);
-        });
-      })();
-      </script>
     </div>
 
     <aside class="shell-side" hidden aria-label="答题辅助">

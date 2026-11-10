@@ -29,7 +29,9 @@
     if (!tierFor(amountCents)) return null;
     const occurredAt = typeof event.occurredAt === 'number' ? event.occurredAt : Date.parse(event.occurredAt);
     if (!Number.isFinite(occurredAt) || occurredAt > now + 30000 || occurredAt < now - 120000) return null;
-    return {id: event.id, amountCents, occurredAt, tier: tierFor(amountCents)};
+    const nickname=typeof event.nickname==='string'&&/^[\p{L}\p{N} ._·-]{1,20}$/u.test(event.nickname)?event.nickname:'';
+    const intentId=typeof event.intentId==='string'&&/^[a-f0-9]{48}$/.test(event.intentId)?event.intentId:'';
+    return {id: event.id, amountCents, occurredAt, nickname, intentId, tier: tierFor(amountCents)};
   }
   function format(cents) { return (cents / 100).toFixed(2); }
   return Object.freeze({tiers, amountToCents, tierFor, normalize, format});

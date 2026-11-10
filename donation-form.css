@@ -1,0 +1,21 @@
+#donate-modal .donate-card{width:440px;max-width:calc(100vw - 28px);padding:26px;text-align:left;background:var(--paper,#fffdfa);color:var(--ink,#2d2b28)}
+#donate-modal h2{margin:0 0 8px;font-size:24px}#donate-modal p{line-height:1.65}
+#donate-modal .donation-intro{margin:0 0 20px;color:var(--muted,#746d64);font-size:14px}
+#donate-modal .donation-field{display:grid;gap:7px;margin:14px 0;font-size:14px;font-weight:600}
+#donate-modal .donation-field input,#donate-modal .donation-field select{width:100%;box-sizing:border-box;border:1px solid var(--line,#e3d9cc);border-radius:12px;padding:11px 12px;font:inherit;font-size:16px;font-weight:400;background:var(--paper,#fffdfa);color:inherit}
+#donate-modal .donation-consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6;margin:16px 0}
+#donate-modal .donation-consent input{margin-top:4px;flex-shrink:0}
+#donate-modal .donation-primary,#donate-modal .donation-secondary{width:100%;min-height:44px;padding:11px 16px;border-radius:12px;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}
+#donate-modal .donation-primary{background:var(--red,#c44236);color:#fff;border:1px solid transparent}
+#donate-modal .donation-secondary{border:1px solid var(--line,#e3d9cc);background:transparent;color:inherit}
+#donate-modal button:disabled{opacity:.55;cursor:wait}
+#donate-modal .donation-notice{font-size:12px;color:var(--muted,#746d64);margin:14px 0}
+#donate-modal .donation-amount{font-size:38px;line-height:1.2;font-weight:750;color:var(--red,#c44236);margin:10px 0;letter-spacing:-.03em}
+#donate-modal .donation-countdown{font-size:14px;font-variant-numeric:tabular-nums}
+#donate-modal .donation-error{color:var(--red,#c44236);font-size:14px;margin:12px 0}
+#donate-modal .donation-qr{margin:18px 0;text-align:center}#donate-modal .donation-qr img{max-height:min(49vh,420px);max-width:100%;border-radius:10px}
+#donate-modal .donation-connection{font-size:12px;color:var(--muted,#746d64);margin:15px 0 0}
+#donate-modal .donation-heading{display:flex;gap:12px;justify-content:space-between;align-items:start}
+#donate-modal .donation-dismiss{border:0;background:transparent;color:inherit;min-width:44px;min-height:44px;font:inherit;cursor:pointer}
+#donate-modal [hidden]{display:none!important}
+@media(max-width:480px){#donate-modal .donate-card{padding:20px}#donate-modal .donation-amount{font-size:34px}}
