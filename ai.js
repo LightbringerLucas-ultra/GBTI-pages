@@ -91,22 +91,6 @@ const GBTI_AI = (function () {
     } catch (error) { /* 忽略写入失败。 */ }
   }
 
-  /* ---------- 顶部入口状态 ---------- */
-
-  // 右上角入口显示昵称与配置状态：已填好可用的接口时点亮小圆点。
-  function syncUserEntry() {
-    const label = document.querySelector("#user-open-label");
-    if (label) label.textContent = state.userName || "用户登录";
-    const dot = document.querySelector("#user-open-dot");
-    if (dot) dot.hidden = !remoteReady();
-    const button = document.querySelector("#user-open");
-    if (button) {
-      button.title = state.userName
-        ? "用户中心 · " + state.userName + (remoteReady() ? "（已配置大模型）" : "（本地引擎）")
-        : "用户登录与 AI 配置";
-    }
-  }
-
   /* ---------- 小工具 ---------- */
 
   function esc(text) {
@@ -516,7 +500,7 @@ const GBTI_AI = (function () {
           text: [
             "切换到大模型只要三步：",
             "",
-            "1. 点右上角「用户登录」，或我这个面板右上角的齿轮，打开用户中心。",
+            "1. 点 AI 助手面板右上角的齿轮，打开用户中心。",
             "2. 在「AI 配置」里填三项：服务地址、API Key、模型名称；用 DeepSeek 可以点「一键填入」，再补上 key。",
             "3. 点「保存并启用」。",
             "",
@@ -1034,7 +1018,7 @@ const GBTI_AI = (function () {
     setEngineChip();
     setSubtitle();
 
-    [["#ai-fab", toggle], ["#ai-fab-inline", toggle], ["#open-ai", function () { open(); }],
+    [["#ai-fab", toggle],
       ["#side-ai", function () { open(); }], ["#hero-ai", function () { open("帮我解读一下我的结果"); }],
       ["#intro-ai", function () { open("这个测试是怎么设计的"); }]
     ].forEach(function (pair) {
@@ -1123,7 +1107,7 @@ const GBTI_AI = (function () {
       if (event.key === "Escape" && state.open && !document.querySelector("dialog[open]")) close();
     });
 
-    // 用户中心（含 AI 配置）。顶部入口与助手面板的齿轮按钮打开的是同一个面板。
+    // 通过助手面板的齿轮按钮打开用户中心和 AI 配置。
     const settings = document.querySelector("#ai-settings");
     const baseInput = document.querySelector("#ai-base");
     const keyInput = document.querySelector("#ai-key");
@@ -1143,8 +1127,6 @@ const GBTI_AI = (function () {
     };
 
     document.querySelector("#ai-settings-open").addEventListener("click", openSettings);
-    const entry = document.querySelector("#user-open");
-    if (entry) entry.addEventListener("click", openSettings);
 
     document.querySelectorAll("[data-preset]").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -1176,7 +1158,6 @@ const GBTI_AI = (function () {
       state.userName = nameInput ? nameInput.value.trim().slice(0, 16) : state.userName;
       saveUserName(state.userName);
       setEngineChip();
-      syncUserEntry();
       settings.close();
       const who = state.userName ? state.userName + "，" : "";
       const tip = remoteReady()
@@ -1191,12 +1172,10 @@ const GBTI_AI = (function () {
       baseInput.value = ""; keyInput.value = ""; modelInput.value = "";
       if (strictInput) strictInput.checked = false;
       setEngineChip();
-      syncUserEntry();
       settings.close();
       bubble("ai", toHtml("已清除接口配置，回到本地引擎模式。昵称保留不变。"));
     });
 
-    syncUserEntry();
   }
 
   // 面板里跟进显示当前生效的引擎，避免只看三个输入框判断不出有没有生效。
@@ -1218,7 +1197,7 @@ const GBTI_AI = (function () {
     // 一次性补全：{ system, user, temperature, maxTokens, signal, onDelta } → Promise<string>。
     // 供其它模块复用同一份接口配置与流式解析。
     complete: complete,
-    // 打开用户中心（含 AI 配置）面板，供顶部「用户登录」入口复用。
+    // 打开用户中心和 AI 配置。
     openSettings: function () { if (openSettings) openSettings(); },
     getUserName: function () { return state.userName; },
     // 暴露纯逻辑入口，供离线自动化测试与后续扩展使用，不参与页面渲染。

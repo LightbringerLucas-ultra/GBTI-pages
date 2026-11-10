@@ -829,28 +829,6 @@
     return details;
   }
 
-  function injectHeroCta() {
-    var top = document.querySelector("#result .hero-top");
-    if (!top || document.getElementById("mx-hero-cta")) return;
-    var btn = document.createElement("button");
-    btn.id = "mx-hero-cta";
-    btn.type = "button";
-    btn.className = "pill-button";
-    btn.textContent = "今日玄学 · 塔罗";
-    btn.addEventListener("click", function () {
-      if (window.GBTI_RESULT_PAGES) {
-        window.GBTI_RESULT_PAGES.open("xuanxue");
-        return;
-      }
-      var panel = document.getElementById("xuanxue");
-      if (panel) {
-        panel.open = true;
-        panel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-    top.appendChild(btn);
-  }
-
   function codeFromResult() {
     var el = document.getElementById("result-code");
     return el ? el.textContent.trim().toUpperCase() : "";
@@ -876,7 +854,6 @@
       console.warn("[GBTI玄学模块] 未找到 lunar.js，黄历功能不可用。请确认已引入 lunar.js。");
     }
     buildPanel();
-    injectHeroCta();
 
     // 直接带 ?section=xuanxue&tab=west 打开时，落到「西方塔罗」分页。
     if (new URL(location.href).searchParams.get("tab") === "west") setTab("west", { silent: true });
