@@ -1165,9 +1165,12 @@
   /* ---------------- 挂载（纯增量，不改动原有逻辑） ---------------- */
 
   function buildPanel() {
+    // 合并入口：东方玄学面板已预留「西方塔罗」分页（#tr-pane / #tr-body），直接复用，
+    // 不再单独生成顶层折叠区。只有在缺少玄学面板时才保留独立挂载作为降级。
+    if (document.getElementById("tr-pane")) return;
     var result = document.getElementById("result");
-    if (!result || document.getElementById("tarot")) return;
-    var anchor = document.getElementById("xuanxue") || document.getElementById("plan");
+    if (!result || document.getElementById("xuanxue") || document.getElementById("tarot")) return;
+    var anchor = document.getElementById("plan");
 
     var details = document.createElement("details");
     details.id = "tarot";
@@ -1187,20 +1190,6 @@
     if (anchor) anchor.parentNode.insertBefore(details, anchor.nextSibling);
     else result.appendChild(details);
     return details;
-  }
-
-  function injectHeroCta() {
-    var top = document.querySelector("#result .hero-top");
-    if (!top || document.getElementById("tr-hero-cta")) return;
-    var btn = document.createElement("button");
-    btn.id = "tr-hero-cta";
-    btn.type = "button";
-    btn.className = "pill-button";
-    btn.textContent = "今日塔罗";
-    btn.addEventListener("click", function () {
-      if (window.GBTI_RESULT_PAGES) window.GBTI_RESULT_PAGES.open("tarot");
-    });
-    top.appendChild(btn);
   }
 
   function codeFromResult() {
@@ -1248,7 +1237,6 @@
 
   function init() {
     buildPanel();
-    injectHeroCta();
 
     var code = codeFromResult();
     if (code && personalityByCode(code)) renderFor(code);

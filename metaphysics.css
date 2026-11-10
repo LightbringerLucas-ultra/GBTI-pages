@@ -4,6 +4,31 @@
 
 .mx-body { display: flex; flex-direction: column; gap: 26px; padding-top: 4px; }
 
+/* ---------- 合并入口的分页：东方玄学 / 西方塔罗 ---------- */
+.mx-tabs {
+  display: inline-flex; gap: 4px; padding: 4px; width: fit-content;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface-muted);
+}
+.mx-tab {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 8px 18px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--muted);
+  font-family: inherit; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.mx-tab em { font-style: normal; font-size: 11.5px; font-weight: 400; color: var(--faint); }
+.mx-tab:hover { color: var(--ink); }
+.mx-tab.is-active { background: var(--surface); color: var(--ink-strong); box-shadow: var(--shadow-xs); }
+.mx-tab.is-active em { color: var(--muted); }
+.mx-tab:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.mx-pane[hidden] { display: none; }
+@media (max-width: 560px) {
+  .mx-tabs { display: flex; width: 100%; }
+  .mx-tab { flex: 1; justify-content: center; padding: 8px 10px; }
+  .mx-tab em { display: none; }
+}
+
 .mx-section { display: flex; flex-direction: column; gap: 14px; }
 .mx-h3 {
   font-size: 14px; font-weight: 600; color: var(--ink-strong);

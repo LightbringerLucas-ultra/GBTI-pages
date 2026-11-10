@@ -4,8 +4,8 @@
   const sections = {
     news: { id: 'weekly-news', kicker: '每周精选', title: '与你的投资风格相符的资讯', description: '查看精选资讯和推荐依据，也可以转动 3D 地球仪浏览全球消息。' },
     plan: { id: 'plan', kicker: '资产配置建议', title: '按你的风格，钱可以这样分', description: '查看资产比例、示例标的与风险提示。' },
-    xuanxue: { id: 'xuanxue', kicker: '玄学操盘适配度 · AI 模块', title: '今日卦象与适配度', description: '结合投资风格、卦象和节气，查看今日的投教提示。' },
-    tarot: { id: 'tarot', kicker: '塔罗映照 · 西方象征系统', title: '本命牌 · 今日牌 · 东西合参', description: '用本命牌与今日牌对照东方卦象，作为自我反思的提问方式，不预测涨跌。' }
+    // 东方玄学与西方塔罗合并为一个入口，进入后用分页切换（?tab=west 直接落到塔罗）。
+    xuanxue: { id: 'xuanxue', kicker: '东方玄学 · 西方塔罗', title: '今日卦象与塔罗映照', description: '东方玄学与西方塔罗合并在同一页：可切换查看卦象、黄历与适配度，或本命牌、今日牌与东西合参。' }
   };
   const root = document.documentElement;
   const result = document.getElementById('result');
@@ -15,6 +15,19 @@
   function requestedSection() {
     const value = new URL(location.href).searchParams.get('section');
     return Object.hasOwn(sections, value) ? value : null;
+  }
+  // 旧链接 ?section=tarot 统一并入玄学入口，并直接落到「西方塔罗」分页。
+  function mergeLegacySection() {
+    const url = new URL(location.href);
+    if (url.searchParams.get('section') !== 'tarot') return;
+    url.searchParams.set('section', 'xuanxue');
+    url.searchParams.set('tab', 'west');
+    history.replaceState({ gbtiResultSection: 'xuanxue' }, '', url);
+  }
+  function applyTab(section) {
+    if (section !== 'xuanxue' || !window.GBTI_XUANXUE || typeof window.GBTI_XUANXUE.setTab !== 'function') return;
+    const tab = new URL(location.href).searchParams.get('tab') === 'west' ? 'west' : 'east';
+    window.GBTI_XUANXUE.setTab(tab, { silent: true });
   }
   function renderView(section, focus) {
     const data = sections[section];
@@ -52,6 +65,7 @@
     url.hash = '';
     history.pushState({ gbtiResultSection: section }, '', url);
     renderView(section, true);
+    applyTab(section);
   }
   function returnToResult(section) {
     renderView(null, false);
@@ -76,6 +90,7 @@
   function reset() {
     const url = new URL(location.href);
     url.searchParams.delete('section');
+    url.searchParams.delete('tab');
     url.searchParams.delete('view');
     history.replaceState({}, '', url);
     renderView(null, false);
@@ -96,12 +111,15 @@
       const next = requestedSection();
       if (!next && previous) returnToResult(previous);
       else renderView(next, true);
+      applyTab(next);
     });
+    mergeLegacySection();
     const section = requestedSection();
     const wantsResult = new URL(location.href).searchParams.get('view') === 'result';
     if ((section || wantsResult) && answeredCount() === questions.length) {
       enterTest();
       renderView(section, false);
+      applyTab(section);
     } else if (section || wantsResult) {
       const url = new URL(location.href);
       url.searchParams.delete('section');

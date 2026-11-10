@@ -135,6 +135,23 @@
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
+  /* ---------------- 日期键（必须用本地年月日） ---------------- */
+  // 不能改用 toISOString()：它取的是 UTC 日期，在东八区，本地 00:00 对应
+  // UTC 前一日 16:00，于是「选 11 月 11 日」会被算成 11 月 10 日，日期输入框
+  // 也会跟着回退一天。这里与 tarot.js 的 ymd()/noonOf() 保持完全一致。
+  function ymd(date) {
+    var y = date.getFullYear();
+    var m = date.getMonth() + 1;
+    var d = date.getDate();
+    return y + "-" + (m < 10 ? "0" : "") + m + "-" + (d < 10 ? "0" : "") + d;
+  }
+  // 统一取「当天正午」代表某一天：避开午夜换算落到前一日，也避开夏令时切换。
+  function noonOf(y, m, d) { return new Date(y, m - 1, d, 12, 0, 0, 0); }
+  function todayNoon() {
+    var now = new Date();
+    return noonOf(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  }
+
   /* ---------------- 确定性起卦（三枚铜钱法） ---------------- */
 
   function hashString(str) {
@@ -183,7 +200,7 @@
   /* ---------------- 黄历（lunar.js） ---------------- */
 
   function buildAlmanac(date) {
-    if (typeof Solar === "undefined") return { available: false, date: date.toISOString().slice(0, 10) };
+    if (typeof Solar === "undefined") return { available: false, date: ymd(date) };
     var solar = Solar.fromYmd(date.getFullYear(), date.getMonth() + 1, date.getDate());
     var lu = solar.getLunar();
     function s(fn, dflt) {
@@ -201,7 +218,7 @@
 
     return {
       available: true,
-      date: date.toISOString().slice(0, 10),
+      date: ymd(date),
       week: "星期" + (s("getWeekInChinese", "")),
       lunar: {
         year: s("getYearInChinese", ""), month: s("getMonthInChinese", ""), day: s("getDayInChinese", ""),
@@ -432,7 +449,7 @@
     var x = XUANXUE_MAP[gbti.code] || XUANXUE_MAP.FLDO;
     var almanac = buildAlmanac(date);
     // 「当日卦象」按日期起卦，同一天所有人看到同一卦；个性化由「类型 × 卦象」的风格契合承载。
-    var castResult = cast(date.toISOString().slice(0, 10), "今日是否适合操盘");
+    var castResult = cast(ymd(date), "今日是否适合操盘");
     var fit = computeFitness(gbti, almanac, castResult, state.weights);
     return { gbti: gbti, xuanxue: x, almanac: almanac, cast: castResult, fitness: fit };
   }
@@ -675,7 +692,8 @@
     if (dateInput) {
       dateInput.addEventListener("change", function () {
         if (!dateInput.value) return;
-        var d = new Date(dateInput.value + "T00:00:00");
+        var parts = dateInput.value.split("-");
+        var d = noonOf(+parts[0], +parts[1], +parts[2]);
         if (isNaN(d.getTime())) return;
         state.date = d;
         state.reading = computeReading(state.outcome, d);
@@ -734,6 +752,46 @@
 
   /* ---------------- 挂载（不改动原有逻辑，靠 MutationObserver 感知结果） ---------------- */
 
+  /* 合并入口：东方玄学 / 西方塔罗 共用同一个子页面，用分页切换。
+     塔罗模块（tarot.js）会把内容挂进这里预留的 #tr-pane / #tr-body。 */
+
+  function setTab(name, opts) {
+    if (name !== "east" && name !== "west") name = "east";
+    [["east", "mx-pane"], ["west", "tr-pane"]].forEach(function (pair) {
+      var pane = document.getElementById(pair[1]);
+      if (pane) pane.hidden = pair[0] !== name;
+      var btn = document.querySelector('.mx-tab[data-tab="' + pair[0] + '"]');
+      if (!btn) return;
+      var on = pair[0] === name;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+      btn.tabIndex = on ? 0 : -1;
+    });
+    if (!opts || !opts.silent) {
+      var url = new URL(location.href);
+      if (url.searchParams.get("section") === "xuanxue") {
+        if (name === "east") url.searchParams.delete("tab");
+        else url.searchParams.set("tab", name);
+        history.replaceState(history.state, "", url);
+      }
+    }
+  }
+
+  function bindTabs() {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll(".mx-tab"));
+    tabs.forEach(function (btn) {
+      btn.addEventListener("click", function () { setTab(btn.getAttribute("data-tab")); });
+      btn.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        e.preventDefault();
+        var i = tabs.indexOf(btn);
+        var next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+        next.focus();
+        setTab(next.getAttribute("data-tab"));
+      });
+    });
+  }
+
   function buildPanel() {
     var result = document.getElementById("result");
     if (!result || document.getElementById("xuanxue")) return;
@@ -746,16 +804,28 @@
       '<summary class="fold-head">'
       + '<span class="fold-mark" aria-hidden="true">玄学</span>'
       + '<span class="fold-text">'
-      +   '<span class="section-kicker">玄学操盘适配度 · AI 模块</span>'
+      +   '<span class="section-kicker">东方玄学 · 西方塔罗</span>'
       +   '<span class="fold-title" id="mx-head-title">今日卦象 · 节气 · 是否适合操盘</span>'
-      +   '<span class="fold-hint">结合你的类型与当日卦象、节气，输出适配度与「适合动手 / 适合复盘学习 / 适合观望」的投教建议。</span>'
+      +   '<span class="fold-hint">东方玄学与西方塔罗合并为一个入口：可切换查看卦象、黄历、适配度与塔罗牌，并做东西合参。</span>'
       + '</span>'
       + '<span class="fold-chev" aria-hidden="true"></span>'
       + '</summary>'
-      + '<div class="fold-body"><div id="mx-body" class="mx-body"></div></div>';
+      + '<div class="fold-body">'
+      +   '<div class="mx-tabs" role="tablist" aria-label="玄学板块切换">'
+      +     '<button type="button" class="mx-tab is-active" role="tab" id="mx-tab-east" data-tab="east" aria-selected="true" aria-controls="mx-body">东方玄学<em>卦象 · 黄历 · 适配度</em></button>'
+      +     '<button type="button" class="mx-tab" role="tab" id="mx-tab-west" data-tab="west" aria-selected="false" aria-controls="tr-body" tabindex="-1">西方塔罗<em>本命牌 · 今日牌 · 东西合参</em></button>'
+      +   '</div>'
+      +   '<div id="mx-pane" class="mx-pane" role="tabpanel" aria-labelledby="mx-tab-east">'
+      +     '<div id="mx-body" class="mx-body"></div>'
+      +   '</div>'
+      +   '<div id="tr-pane" class="mx-pane" role="tabpanel" aria-labelledby="mx-tab-west" hidden>'
+      +     '<div id="tr-body" class="tr-body"></div>'
+      +   '</div>'
+      + '</div>';
 
     if (plan) result.insertBefore(details, plan.nextSibling);
     else result.appendChild(details);
+    bindTabs();
     return details;
   }
 
@@ -766,7 +836,7 @@
     btn.id = "mx-hero-cta";
     btn.type = "button";
     btn.className = "pill-button";
-    btn.textContent = "今日玄学适配度";
+    btn.textContent = "今日玄学 · 塔罗";
     btn.addEventListener("click", function () {
       if (window.GBTI_RESULT_PAGES) {
         window.GBTI_RESULT_PAGES.open("xuanxue");
@@ -795,7 +865,7 @@
     var p = personalityByCode(code);
     if (!p) return;
     state.outcome = { personality: p, scores: null, axisCode: code };
-    state.date = new Date();
+    state.date = todayNoon();
     state.reading = computeReading(state.outcome, state.date);
     state.aiSource = "template";
     render();
@@ -807,6 +877,9 @@
     }
     buildPanel();
     injectHeroCta();
+
+    // 直接带 ?section=xuanxue&tab=west 打开时，落到「西方塔罗」分页。
+    if (new URL(location.href).searchParams.get("tab") === "west") setTab("west", { silent: true });
 
     var code = codeFromResult();
     if (code && personalityByCode(code)) renderFor(code);
@@ -830,6 +903,8 @@
   window.GBTI_XUANXUE = {
     init: init,
     renderFor: renderFor,
+    // 合并入口的分页：'east' 东方玄学 / 'west' 西方塔罗
+    setTab: setTab,
     readingFor: function (outcome, date) { return computeReading(outcome, date); },
     // 纯逻辑接口（供测试与后续扩展，不参与页面渲染）
     computeFitness: function (gbti, almanac, castResult, weights) { return computeFitness(gbti, almanac, castResult, weights || state.weights); },

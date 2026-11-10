@@ -200,13 +200,12 @@ html.on-subpage #result { padding-top: 0; }
 html.on-subpage #result > * { display: none !important; }
 html.on-subpage[data-section="news"] #result > #weekly-news,
 html.on-subpage[data-section="plan"] #result > #plan,
-html.on-subpage[data-section="xuanxue"] #result > #xuanxue,
-html.on-subpage[data-section="tarot"] #result > #tarot { display: block !important; margin-top: 0; }
+html.on-subpage[data-section="xuanxue"] #result > #xuanxue { display: block !important; margin-top: 0; }
 html.on-subpage #result > .fold { border: 0; background: transparent; box-shadow: none; overflow: visible; }
 html.on-subpage #result > .fold > summary { display: none; }
 html.on-subpage #result > .fold > .fold-body { padding: 0; }
-html:not(.on-subpage) #result > :is(#weekly-news,#plan,#xuanxue,#tarot) > summary .fold-chev { transform: rotate(-90deg); }
-html:not(.on-subpage) #result > :is(#weekly-news,#plan,#xuanxue,#tarot) > summary[role="link"] { cursor: pointer; }
+html:not(.on-subpage) #result > :is(#weekly-news,#plan,#xuanxue) > summary .fold-chev { transform: rotate(-90deg); }
+html:not(.on-subpage) #result > :is(#weekly-news,#plan,#xuanxue) > summary[role="link"] { cursor: pointer; }
 
 .intro { padding: var(--space-2) 2px var(--space-3); }
 .eyebrow, .section-kicker {
