@@ -626,7 +626,6 @@
     }
   }
   function onThemeChange() {
-    renderPersona();
     if (!chart || !chart.curves || !chart.curves.length) return;
     chart.curves.forEach(function (c) { c.color = colorFor(c.code); });
     drawChart(chart.curves);

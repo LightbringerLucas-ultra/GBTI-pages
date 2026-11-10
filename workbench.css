@@ -150,3 +150,94 @@
   .wb-persona-switch { min-width: 100%; }
   .wb-table { font-size: 12px; }
 }
+
+/* ==========================================================================
+   今日人格龙虎榜 · 一键预设 · 人格嘴替
+   只服务工作台这一页，颜色沿用设计令牌，涨用红、跌用绿。
+   ========================================================================== */
+
+.wb-rank { display: grid; gap: 12px; }
+.wb-rank-lead { margin: 0; font-size: 13px; line-height: 1.8; color: var(--muted); }
+.wb-rank-lead b { color: var(--ink-strong); font-weight: 700; }
+
+.wb-rank-body { display: grid; gap: 5px; }
+.wb-rank-row {
+  display: grid; grid-template-columns: 22px 156px minmax(48px, 1fr) 72px 52px;
+  align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink);
+}
+.wb-rank-pos { font-family: "Times New Roman", serif; font-size: 12px; color: var(--faint); }
+.wb-rank-name { display: inline-flex; align-items: baseline; gap: 6px; min-width: 0; }
+.wb-rank-name b { font-family: "Times New Roman", serif; font-size: 12.5px; color: var(--ink-strong); letter-spacing: .04em; }
+.wb-rank-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wb-rank-track { position: relative; height: 8px; border-radius: 999px; background: var(--surface-muted); }
+.wb-rank-track::after {
+  content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px;
+  width: 1px; background: var(--line-strong);
+}
+.wb-rank-track i { position: absolute; top: 0; bottom: 0; border-radius: 999px; display: block; }
+.wb-rank-track i.is-up { left: 50%; background: var(--red); }
+.wb-rank-track i.is-down { right: 50%; background: var(--green); }
+.wb-rank-track i.is-flat { left: 50%; background: var(--line-strong); }
+.wb-rank-val { font-family: "Times New Roman", serif; font-size: 13px; text-align: right; }
+.wb-rank-val.is-up { color: var(--red); }
+.wb-rank-val.is-down { color: var(--green); }
+.wb-rank-val.is-flat { color: var(--muted); }
+.wb-rank-n { font-size: 11px; color: var(--faint); text-align: right; }
+.wb-rank-gap {
+  margin: 2px 0; padding-left: 32px;
+  font-size: 11px; color: var(--faint); letter-spacing: .06em;
+}
+
+.wb-rank-top { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.wb-rank-pick {
+  display: grid; gap: 4px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface-muted);
+  font-size: 11.5px; line-height: 1.6; color: var(--muted);
+}
+.wb-rank-pick b { font-size: 12.5px; color: var(--ink-strong); }
+.wb-rank-tag {
+  width: fit-content; padding: 1px 8px; border-radius: 999px;
+  font-size: 10.5px; letter-spacing: .04em;
+}
+.wb-rank-tag.is-up { background: color-mix(in srgb, var(--red) 14%, transparent); color: var(--red); }
+.wb-rank-tag.is-down { background: color-mix(in srgb, var(--green) 16%, transparent); color: var(--green); }
+.wb-rank-tag.is-flat { background: var(--line); color: var(--muted); }
+.wb-rank-toggle { justify-self: start; }
+
+/* ---------- 一键预设 ---------- */
+.wb-presets {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin: 0 0 14px;
+}
+.wb-presets-label { font-size: 11px; letter-spacing: .14em; color: var(--faint); }
+.wb-preset {
+  font: inherit; font-size: 12.5px; padding: 5px 13px; border-radius: 999px;
+  border: 1px dashed var(--line-strong); background: transparent; color: var(--ink);
+  cursor: pointer; transition: color .18s, border-color .18s, background .18s;
+}
+.wb-preset:hover { border-style: solid; border-color: var(--red); color: var(--red); }
+.wb-preset.is-on { border-style: solid; border-color: var(--red); background: var(--red); color: #fff; }
+.wb-preset:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.wb-preset-note { font-size: 11.5px; color: var(--faint); }
+.wb-preset-note b { color: var(--red); font-family: "Times New Roman", serif; }
+
+/* ---------- 人格嘴替 ---------- */
+.wb-quip {
+  position: fixed; z-index: 60; max-width: 268px;
+  padding: 9px 12px; border-radius: 10px;
+  background: var(--ink-strong); color: var(--surface);
+  font-size: 12px; line-height: 1.65;
+  box-shadow: 0 12px 26px rgba(24, 20, 16, .22);
+  pointer-events: none;
+}
+.wb-quip b { margin-right: 6px; font-family: "Times New Roman", serif; letter-spacing: .04em; }
+
+@media (max-width: 900px) {
+  .wb-rank-row { grid-template-columns: 20px minmax(90px, 132px) minmax(40px, 1fr) 64px 44px; gap: 8px; }
+  .wb-rank-top { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .wb-rank-row { grid-template-columns: 18px minmax(84px, 116px) minmax(36px, 1fr) 58px; }
+  .wb-rank-n { display: none; }
+  .wb-rank-name i, .wb-rank-name em { display: none; }
+}

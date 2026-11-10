@@ -1,0 +1,359 @@
+/* ==========================================================================
+   GBTI 基金经理模拟器
+   全屏弹窗里的一个小游戏：卡片、净值曲线、结算单。颜色全部走设计令牌。
+   ========================================================================== */
+
+.sim-modal {
+  width: min(96vw, 880px);
+  max-width: 880px;
+  max-height: 92vh;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(20, 16, 12, .35);
+}
+.sim-modal::backdrop { background: rgba(20, 16, 12, .62); }
+.sim-modal[open] { animation: simIn 240ms var(--ease, ease) both; }
+@keyframes simIn {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+
+.sim-shell { position: relative; max-height: 92vh; overflow-y: auto; }
+.sim-close {
+  position: sticky; top: 10px; float: right; z-index: 2;
+  margin: 10px 12px 0 0;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: var(--surface);
+  color: var(--muted); font-size: 13px; cursor: pointer;
+}
+.sim-close:hover { color: var(--red); border-color: var(--red); }
+
+.sim-body { padding: 26px 30px 30px; }
+.sim-eyebrow {
+  margin: 0 0 8px; font-size: 10.5px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--faint);
+}
+.sim-h2 { margin: 0 0 12px; font-size: 26px; line-height: 1.35; color: var(--ink-strong); }
+.sim-h2 span { display: block; margin-top: 6px; font-size: 13px; font-weight: 400; color: var(--muted); }
+.sim-lead { margin: 0 0 16px; font-size: 13.5px; line-height: 1.85; color: var(--muted); }
+.sim-lead strong { color: var(--ink-strong); }
+.sim-rules { margin: 0 0 18px; padding: 0; list-style: none; display: grid; gap: 7px; }
+.sim-rules li {
+  position: relative; padding-left: 16px; font-size: 12.5px; line-height: 1.75; color: var(--muted);
+}
+.sim-rules li::before {
+  content: ""; position: absolute; left: 0; top: 9px;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--red);
+}
+.sim-resume {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin: 0 0 16px; padding: 12px 14px;
+  border: 1px dashed var(--line-strong); border-radius: 12px; background: var(--surface-muted);
+  font-size: 12px; color: var(--muted);
+}
+.sim-resume b { color: var(--ink-strong); font-size: 12.5px; }
+.sim-intro-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.sim-btn { font-size: 13px; padding: 9px 18px; }
+.sim-btn-main { background: var(--red); border-color: var(--red); color: #fff; }
+.sim-btn-main:hover { filter: brightness(1.05); }
+.sim-foot { margin: 18px 0 0; font-size: 11px; line-height: 1.8; color: var(--faint); }
+
+/* ---------- 盘中 ---------- */
+.sim-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.sim-net {
+  margin: 0; font-family: "Times New Roman", serif; font-size: 30px; color: var(--ink-strong);
+  letter-spacing: .02em;
+}
+.sim-net span { margin-left: 10px; font-size: 14px; }
+.sim-net .is-up, .sim-ret.is-up { color: var(--red); }
+.sim-net .is-down, .sim-ret.is-down { color: var(--green); }
+.sim-top-r {
+  display: flex; flex-wrap: wrap; gap: 12px; font-size: 11.5px; color: var(--faint);
+}
+.sim-spark { display: block; width: 100%; height: 86px; margin: 10px 0 14px; }
+
+.sim-event {
+  margin: 0 0 14px; padding: 12px 14px;
+  border-left: 3px solid var(--red); border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--red) 7%, var(--surface));
+}
+.sim-event-tag { font-size: 10.5px; letter-spacing: .1em; color: var(--red); }
+.sim-event p { margin: 5px 0 4px; font-size: 13.5px; line-height: 1.7; color: var(--ink-strong); }
+.sim-event small { font-size: 11px; color: var(--faint); }
+
+.sim-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sim-card {
+  display: grid; gap: 8px; padding: 13px 14px 12px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface-muted);
+  text-align: left; cursor: pointer; font: inherit; color: inherit;
+  transition: border-color .18s, transform .18s, box-shadow .18s;
+}
+.sim-card:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+.sim-card.is-on {
+  border-color: var(--red); background: var(--surface);
+  box-shadow: 0 0 0 1px var(--red), 0 10px 24px rgba(196, 66, 54, .12);
+}
+.sim-card-top { display: flex; align-items: center; gap: 8px; }
+.sim-card-name { display: grid; font-size: 14px; font-weight: 700; color: var(--ink-strong); line-height: 1.3; }
+.sim-card-name i { font-style: normal; font-size: 10.5px; font-weight: 400; color: var(--faint); letter-spacing: .04em; }
+.sim-badge {
+  margin-left: auto; padding: 1px 7px; border-radius: 999px;
+  font-size: 10px; background: var(--red); color: #fff;
+}
+.sim-card-meta { font-size: 11px; color: var(--muted); }
+.sim-card-row { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--muted); }
+.sim-card-row b { font-family: "Times New Roman", serif; color: var(--ink); font-size: 12px; }
+.sim-card-code {
+  display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted);
+  padding-top: 6px; border-top: 1px dashed var(--line);
+}
+.sim-card-code b { font-family: "Times New Roman", serif; font-size: 12px; color: var(--ink-strong); }
+
+.sim-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+.sim-hintline { margin: 0 0 12px; font-size: 11.5px; color: var(--faint); }
+
+.sim-log { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.sim-log li {
+  display: grid; gap: 3px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface-muted);
+  font-size: 12px; line-height: 1.7; color: var(--muted);
+}
+.sim-log b { font-family: "Times New Roman", serif; font-size: 11px; color: var(--faint); letter-spacing: .06em; }
+.sim-log em { font-style: normal; color: var(--ink-strong); }
+.sim-log small { color: var(--faint); font-size: 11px; }
+.sim-empty { margin: 10px 0 0; font-size: 12px; color: var(--faint); }
+
+.sim-flash {
+  position: sticky; bottom: 0; margin: 14px 0 0; padding: 10px 12px;
+  border-radius: 10px; background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 8px 22px rgba(20, 16, 12, .14);
+  font-size: 12px; line-height: 1.6; opacity: 0; transform: translateY(6px);
+  transition: opacity .2s, transform .2s;
+}
+.sim-flash.is-on { opacity: 1; transform: none; }
+
+/* ---------- 结算 ---------- */
+.sim-end .sim-h2 { margin-bottom: 4px; }
+.sim-end .sim-h2 span { display: inline; margin: 0; font-size: 26px; font-family: "Times New Roman", serif; color: var(--ink-strong); }
+.sim-ret { margin: 0 0 14px; font-family: "Times New Roman", serif; font-size: 22px; }
+.sim-title {
+  display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  padding: 6px 14px; border-radius: 999px;
+  background: color-mix(in srgb, var(--red) 10%, var(--surface));
+}
+.sim-title span { font-size: 10.5px; letter-spacing: .12em; color: var(--red); }
+.sim-title b { font-size: 15px; color: var(--ink-strong); }
+.sim-verdict { margin: 0 0 18px; font-size: 13.5px; line-height: 1.9; color: var(--muted); }
+.sim-stats {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 6px;
+}
+.sim-stats > div {
+  display: grid; gap: 3px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface-muted);
+}
+.sim-stats span { font-size: 10.5px; color: var(--faint); }
+.sim-stats b { font-family: "Times New Roman", serif; font-size: 15px; color: var(--ink-strong); }
+.sim-days { margin: 4px 0 16px; }
+.sim-days summary {
+  cursor: pointer; font-size: 12px; color: var(--muted);
+  padding: 8px 0; border-top: 1px dashed var(--line);
+}
+.sim-days .sim-log { margin-top: 10px; max-height: 320px; overflow-y: auto; }
+
+@media (max-width: 720px) {
+  .sim-body { padding: 20px 18px 24px; }
+  .sim-cards { grid-template-columns: 1fr; }
+  .sim-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sim-net { font-size: 24px; }
+  .sim-top { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+/* ---------- 工作台里的入口卡 ---------- */
+.wb-sim {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--red) 9%, var(--surface)) 0%,
+    var(--surface) 62%);
+  border: 1px solid color-mix(in srgb, var(--red) 22%, var(--line));
+}
+.wb-sim-main { min-width: 0; }
+.wb-sim-title { margin: 2px 0 4px; font-size: 19px; color: var(--ink-strong); }
+.wb-sim-note { margin: 0; font-size: 12px; line-height: 1.7; color: var(--muted); }
+.wb-sim-open { flex: none; }
+@media (max-width: 620px) {
+  .wb-sim { flex-direction: column; align-items: flex-start; }
+  .wb-sim-open { width: 100%; }
+}
+
+/* ==========================================================================
+   动效：卡片入场、数字跳动、曲线生长、错误抖动、结算盖章
+   全部尊重 prefers-reduced-motion，关掉系统动画就退化成静态
+   ========================================================================== */
+
+.sim-net b { font-weight: 700; }
+.sim-delta {
+  display: inline-block; margin-left: 10px; padding: 2px 8px;
+  border-radius: 999px; font-size: 11.5px; font-style: normal;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  vertical-align: 4px;
+  animation: simDelta 1200ms cubic-bezier(.2,.8,.3,1) both;
+}
+.sim-delta.is-up { color: var(--red); background: color-mix(in srgb, var(--red) 12%, transparent); }
+.sim-delta.is-down { color: var(--green); background: color-mix(in srgb, var(--green) 14%, transparent); }
+@keyframes simDelta {
+  0% { opacity: 0; transform: translateY(8px) scale(.9); }
+  18% { opacity: 1; transform: translateY(0) scale(1); }
+  70% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.sim-net.is-bump { animation: simBump 460ms cubic-bezier(.2,.8,.3,1); }
+@keyframes simBump {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.045); }
+  100% { transform: scale(1); }
+}
+
+/* 三张候选卡依次浮入 */
+.sim-card { animation: simCardIn 340ms cubic-bezier(.2,.8,.3,1) both; }
+.sim-card:nth-child(1) { animation-delay: 20ms; }
+.sim-card:nth-child(2) { animation-delay: 90ms; }
+.sim-card:nth-child(3) { animation-delay: 160ms; }
+@keyframes simCardIn {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+.sim-card:active { transform: scale(.982); }
+
+/* 事件条从左侧滑进来 */
+.sim-event { animation: simSlide 320ms cubic-bezier(.2,.8,.3,1) both; }
+@keyframes simSlide {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 按钮按下有反馈 */
+.sim-btn { transition: transform .12s ease, filter .18s ease, border-color .18s, color .18s; }
+.sim-btn:active { transform: translateY(1px) scale(.985); }
+.sim-btn[disabled] { opacity: .42; cursor: not-allowed; transform: none; box-shadow: none; }
+.sim-btn-main:hover { box-shadow: 0 8px 20px color-mix(in srgb, var(--red) 28%, transparent); }
+
+/* 操作失败：整张弹窗抖一下 */
+.sim-modal.is-shake { animation: simShake 360ms cubic-bezier(.36,.07,.19,.97); }
+@keyframes simShake {
+  10%, 90% { transform: translateX(-2px); }
+  30%, 70% { transform: translateX(3px); }
+  50% { transform: translateX(-4px); }
+}
+
+/* 结算：称号盖章 + 指标逐个落位 */
+.sim-title { animation: simStamp 520ms cubic-bezier(.2,.9,.3,1.15) both; }
+@keyframes simStamp {
+  0% { opacity: 0; transform: scale(1.45) rotate(-5deg); }
+  60% { opacity: 1; transform: scale(.96) rotate(1deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+.sim-stats > div { animation: simRise 380ms cubic-bezier(.2,.8,.3,1) both; }
+.sim-stats > div:nth-child(1) { animation-delay: 80ms; }
+.sim-stats > div:nth-child(2) { animation-delay: 120ms; }
+.sim-stats > div:nth-child(3) { animation-delay: 160ms; }
+.sim-stats > div:nth-child(4) { animation-delay: 200ms; }
+.sim-stats > div:nth-child(5) { animation-delay: 240ms; }
+.sim-stats > div:nth-child(6) { animation-delay: 280ms; }
+@keyframes simRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.sim-verdict { animation: simRise 420ms cubic-bezier(.2,.8,.3,1) 60ms both; }
+.sim-hint-first { animation: simRise 300ms ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sim-card, .sim-event, .sim-title, .sim-stats > div, .sim-verdict,
+  .sim-delta, .sim-net.is-bump, .sim-modal.is-shake, .sim-modal[open] {
+    animation: none !important;
+  }
+  .sim-delta { opacity: 1; }
+}
+
+/* ==========================================================================
+   多只持仓：一只一行，各带自己的卖出键
+   ========================================================================== */
+
+.sim-hold { margin: 16px 0 0; }
+.sim-hold-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  margin-bottom: 8px;
+}
+.sim-hold-title { font-size: 12.5px; font-weight: 700; letter-spacing: .06em; color: var(--ink-strong); }
+.sim-hold-sub { font-size: 11px; line-height: 1.6; color: var(--faint); }
+
+.sim-hold-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.sim-hold-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) 58px 64px 64px 88px 72px;
+  align-items: center; gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface-muted);
+  font-size: 11.5px;
+}
+.sim-hold-id { display: grid; gap: 1px; min-width: 0; }
+.sim-hold-id b {
+  font-size: 12.5px; font-weight: 700; color: var(--ink-strong);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sim-hold-id i, .sim-hold-num i {
+  font-style: normal; font-size: 10px; letter-spacing: .02em; color: var(--faint);
+}
+.sim-hold-num { display: grid; gap: 1px; }
+.sim-hold-num b { font-family: "Times New Roman", serif; font-size: 12.5px; color: var(--ink); }
+.sim-hold-pnl { display: grid; gap: 1px; text-align: right; }
+.sim-hold-pnl b { font-family: "Times New Roman", serif; font-size: 13px; }
+.sim-hold-pnl i { font-style: normal; font-size: 10.5px; color: var(--faint); }
+.sim-hold-pnl.is-up b { color: var(--red); }
+.sim-hold-pnl.is-down b { color: var(--green); }
+.sim-hold-sell { font-size: 11.5px; padding: 5px 8px; }
+
+.sim-hold.is-empty {
+  display: grid; gap: 3px;
+  padding: 12px 14px;
+  border: 1px dashed var(--line-strong); border-radius: 12px;
+}
+
+.sim-warn { margin-left: 4px; color: var(--red); font-weight: 600; }
+
+@media (max-width: 720px) {
+  .sim-hold-row { grid-template-columns: minmax(80px, 1fr) 68px 78px 68px; gap: 6px; }
+  .sim-hold-row > :nth-child(2), .sim-hold-row > :nth-child(3) { display: none; }
+}
+
+/* 加仓与减仓：名字可点选中，右侧两个按钮并排 */
+.sim-hold-row {
+  grid-template-columns: minmax(90px, 1fr) 56px 62px 62px 84px 132px;
+}
+.sim-hold-id {
+  margin: 0; padding: 0; border: 0; background: none;
+  font: inherit; color: inherit; text-align: left; cursor: pointer; min-width: 0;
+}
+.sim-hold-id:hover b { color: var(--red); }
+.sim-hold-id:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 6px; }
+.sim-hold-row.is-on {
+  border-color: var(--red);
+  background: color-mix(in srgb, var(--red) 5%, var(--surface-muted));
+  box-shadow: 0 0 0 1px var(--red);
+}
+.sim-hold-acts { display: flex; gap: 6px; justify-content: flex-end; }
+.sim-hold-acts .sim-hold-sell { padding: 5px 9px; font-size: 11px; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .sim-hold-row {
+    grid-template-columns: minmax(58px, 1fr) 54px 62px 104px;
+    gap: 5px; padding: 9px 10px;
+  }
+  .sim-hold-acts { gap: 4px; }
+  .sim-hold-acts .sim-hold-sell { padding: 4px 6px; font-size: 10.5px; }
+}

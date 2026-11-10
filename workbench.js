@@ -821,10 +821,6 @@
     });
 
     $("wb-export").addEventListener("click", exportCsv);
-    window.addEventListener("gbti-theme-change", function () {
-      renderPersona();
-      render();
-    });
     $("wb-reset").addEventListener("click", function () {
       ids.forEach(function (id) {
         var el = $(id);
@@ -847,4 +843,22 @@
   bind();
   bindMatch();
   refreshAll();
+  /* 给玩法模块（龙虎榜、预设、嘴替）留一个只读入口，避免重复实现一遍取数。 */
+  window.GBTI_WB = {
+    rows: function () { return state.rows.slice(); },
+    personaCode: function () { return state.persona ? state.persona.code : ""; },
+    countText: function () { return $("wb-count") ? $("wb-count").textContent : ""; },
+    applyFilters: function (values) {
+      state.sameOnly = false;
+      state.styleFilterOn = false;
+      Object.keys(values || {}).forEach(function (id) {
+        var el = $(id);
+        if (!el) return;
+        if (el.type === "checkbox") el.checked = Boolean(values[id]);
+        else el.value = values[id];
+        el.dispatchEvent(new Event(el.tagName === "SELECT" || el.type === "checkbox" ? "change" : "input", { bubbles: true }));
+      });
+      refreshAll();
+    }
+  };
 })();

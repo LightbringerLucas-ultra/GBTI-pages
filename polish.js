@@ -33,19 +33,38 @@ const GBTI_LOOK = (function () {
 
   /* 小圆头像：只取插画上部的人物头部区域。 */
   function avatar(code, size, extra) {
-    var src = faceSrc(code);
+    var p = personaOf(code);
+    var src = p ? imageFor(p.imageCode, currentTheme()) : "";
     if (!src) return "";
     return '<span class="gb-face' + (extra ? " " + extra : "") + '" style="--gb-face-size:' + size + 'px">' +
-      '<img src="' + src + '" alt="" loading="lazy" decoding="async"></span>';
+      '<img src="' + src + '" data-gb-code="' + p.imageCode + '" alt="" loading="lazy" decoding="async"></span>';
   }
 
   /* 竖版人物卡：3:4 全图，保留场景。 */
   function figure(code, extra) {
-    var src = faceSrc(code);
+    var p = personaOf(code);
+    var src = p ? imageFor(p.imageCode, currentTheme()) : "";
     if (!src) return "";
     return '<span class="gb-figure' + (extra ? " " + extra : "") + '">' +
-      '<img src="' + src + '" alt="" loading="lazy" decoding="async"></span>';
+      '<img src="' + src + '" data-gb-code="' + p.imageCode + '" alt="" loading="lazy" decoding="async"></span>';
   }
+
+  function reskin(theme) {
+    document.querySelectorAll("img[data-gb-code]").forEach(function (img) {
+      var next = imageFor(img.getAttribute("data-gb-code"), theme || currentTheme());
+      img.setAttribute("data-gb-pending", next);
+      if (!next || next === img.getAttribute("src")) return;
+      var probe = new Image();
+      probe.onload = function () {
+        if (img.getAttribute("data-gb-pending") === next) img.src = next;
+      };
+      probe.src = next;
+    });
+  }
+
+  window.addEventListener("gbti-theme-change", function (event) {
+    reskin(event.theme || currentTheme());
+  });
 
   /* 数字滚动：从 0 滚到目标值，尊重系统的减少动态偏好。 */
   function countUp(el, to, opts) {

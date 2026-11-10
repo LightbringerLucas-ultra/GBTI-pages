@@ -468,9 +468,9 @@
     var same = state.persona && row.personaCode === state.persona.code;
     var tip = (row.personaName || "") + " · 代码 " + row.personaCode + " · 点击查看人格卡";
     var head = window.GBTI_LOOK ? window.GBTI_LOOK.avatar(row.personaCode, 16) : "";
-    return '<span class="wb-ptag' + (same ? " is-same" : "") + '" data-card="' + escapeHtml(row.code) +
+    return '<button type="button" class="wb-ptag' + (same ? " is-same" : "") + '" data-card="' + escapeHtml(row.code) +
       '" title="' + escapeHtml(tip) + '">' + head +
-      escapeHtml(row.personaCode) + "<i>" + escapeHtml(row.personaName || "") + "</i></span>";
+      escapeHtml(row.personaCode) + "<i>" + escapeHtml(row.personaName || "") + "</i></button>";
   }
   function cellHtml(row, col) {
     var q = row.quote || {};
@@ -842,4 +842,23 @@
   bind();
   bindMatch();
   refreshAll();
+
+  /* 给玩法模块（龙虎榜、预设、嘴替）留一个只读入口，避免重复实现一遍取数。 */
+  window.GBTI_WB = {
+    rows: function () { return state.rows.slice(); },
+    personaCode: function () { return state.persona ? state.persona.code : ""; },
+    countText: function () { return $("wb-count") ? $("wb-count").textContent : ""; },
+    applyFilters: function (values) {
+      state.sameOnly = false;
+      state.styleFilterOn = false;
+      Object.keys(values || {}).forEach(function (id) {
+        var el = $(id);
+        if (!el) return;
+        if (el.type === "checkbox") el.checked = Boolean(values[id]);
+        else el.value = values[id];
+        el.dispatchEvent(new Event(el.tagName === "SELECT" || el.type === "checkbox" ? "change" : "input", { bubbles: true }));
+      });
+      refreshAll();
+    }
+  };
 })();

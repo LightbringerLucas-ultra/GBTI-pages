@@ -8,19 +8,24 @@
   <script src="theme-sync.js"></script>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="subpage.css">
-  <link rel="stylesheet" href="workbench.css?v=stock-persona">
+  <link rel="stylesheet" href="workbench.css?v=20261110-games">
   <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="match.css">
+  <link rel="stylesheet" href="sim.css">
   <script src="questions.js" defer></script>
   <script src="scoring.js" defer></script>
   <script src="characters.js" defer></script>
-  <script src="polish.js" defer></script>
+  <script src="polish.js?v=20261110-games" defer></script>
   <script src="pool.js" defer></script>
   <script src="pool-index.js" defer></script>
   <script src="market-data.js" defer></script>
   <script src="allocation.js?v=stock-persona" defer></script>
   <script src="stock-match.js" defer></script>
-  <script src="workbench.js?v=stock-persona" defer></script>
+  <script src="workbench.js?v=20261110-games" defer></script>
+  <script src="workbench-plus.js" defer></script>
+  <script src="index-history.js" defer></script>
+  <script src="sim.js" defer></script>
+  <script src="sim-ui.js" defer></script>
   <script src="donation-core.js?v=20261110-1" defer></script>
   <script src="donation-effects.js?v=20261110-1" defer></script>
 </head>
@@ -79,10 +84,38 @@
       </div>
     </section>
 
+    <section id="wb-rank" class="sp-card wb-rank" hidden aria-label="今日人格龙虎榜">
+      <div class="sp-card-head">
+        <h2>今日人格龙虎榜</h2>
+        <span id="wb-rank-meta">--</span>
+      </div>
+      <p id="wb-rank-lead" class="wb-rank-lead"></p>
+      <div id="wb-rank-body" class="wb-rank-body"></div>
+      <div id="wb-rank-top" class="wb-rank-top"></div>
+      <button id="wb-rank-toggle" class="sp-btn sp-btn-ghost wb-btn wb-rank-toggle" type="button" aria-expanded="false">展开全部 16 型</button>
+    </section>
+
+    <section id="wb-sim" class="sp-card wb-sim" aria-label="基金经理模拟器">
+      <div class="wb-sim-main">
+        <p class="sim-eyebrow">FUND MANAGER SIMULATOR</p>
+        <h2 class="wb-sim-title">接管一只基金</h2>
+        <p id="wb-sim-note" class="wb-sim-note">14 个交易日、100 万虚拟资金、历史指数与模拟个股走势。点开即玩，不用注册。</p>
+      </div>
+      <button id="wb-sim-open" class="sp-btn wb-btn wb-sim-open" type="button">开始一季度</button>
+    </section>
+
     <section id="wb-insight" class="sp-card wb-insight" hidden aria-label="风格分布"></section>
 
     <section class="sp-card" aria-label="筛选条件">
       <div class="sp-card-head"><h2>筛选条件</h2><span>条件只做前置过滤，人格打分仍是主排序</span></div>
+      <div class="wb-presets" aria-label="一键预设">
+        <span class="wb-presets-label">一键预设</span>
+        <button class="wb-preset" data-preset="farmer" type="button">抄底老农</button>
+        <button class="wb-preset" data-preset="elephant" type="button">大象慢走</button>
+        <button class="wb-preset" data-preset="casino" type="button">高换手赌场</button>
+        <button class="wb-preset" data-preset="red" type="button">只看红盘</button>
+        <span id="wb-preset-note" class="wb-preset-note">点一下自动填好条件，再点一次收回</span>
+      </div>
       <div class="wb-filter-grid">
         <label class="sp-field wb-field"><span>关键词</span><input id="wb-search" type="search" placeholder="代码或名称" autocomplete="off"></label>
         <label class="sp-field wb-field"><span>标的来源</span><select id="wb-group"></select></label>

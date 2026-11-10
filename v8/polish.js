@@ -7,15 +7,12 @@
 const GBTI_LOOK = (function () {
   "use strict";
 
-  var THEMES = ["dark", "halloween", "christmas", "spring", "midautumn", "qingming"];
-
   // 先给 html 打标记，样式里只有带这个标记才隐藏待入场的元素，
   // 万一脚本没跑起来，页面内容仍然是可见的。
   try { document.documentElement.classList.add("gb-anim"); } catch (e) { /* 忽略 */ }
 
   function currentTheme() {
-    var t = document.documentElement.getAttribute("data-theme") || "light";
-    return THEMES.indexOf(t) >= 0 ? t : "light";
+    return document.documentElement.getAttribute("data-theme") || "light";
   }
 
   function imageFor(imageCode, theme) {
@@ -33,25 +30,64 @@ const GBTI_LOOK = (function () {
     return null;
   }
 
-  function faceSrc(code) {
+  function imageCodeOf(code) {
     var p = personaOf(code);
-    return p ? imageFor(p.imageCode, currentTheme()) : "";
+    return p && p.imageCode ? p.imageCode : "";
+  }
+
+  function faceSrc(code) {
+    var ic = imageCodeOf(code);
+    return ic ? imageFor(ic, currentTheme()) : "";
   }
 
   /* 小圆头像：只取插画上部的人物头部区域。 */
   function avatar(code, size, extra) {
-    var src = faceSrc(code);
+    var ic = imageCodeOf(code);
+    var src = ic ? imageFor(ic, currentTheme()) : "";
     if (!src) return "";
     return '<span class="gb-face' + (extra ? " " + extra : "") + '" style="--gb-face-size:' + size + 'px">' +
-      '<img src="' + src + '" alt="" loading="lazy" decoding="async"></span>';
+      '<img src="' + src + '" data-gb-code="' + ic + '" data-gb-theme="' + currentTheme() +
+      '" alt="" loading="lazy" decoding="async"></span>';
   }
 
   /* 竖版人物卡：3:4 全图，保留场景。 */
   function figure(code, extra) {
-    var src = faceSrc(code);
+    var ic = imageCodeOf(code);
+    var src = ic ? imageFor(ic, currentTheme()) : "";
     if (!src) return "";
     return '<span class="gb-figure' + (extra ? " " + extra : "") + '">' +
-      '<img src="' + src + '" alt="" loading="lazy" decoding="async"></span>';
+      '<img src="' + src + '" data-gb-code="' + ic + '" data-gb-theme="' + currentTheme() +
+      '" alt="" loading="lazy" decoding="async"></span>';
+  }
+
+  /* 换皮肤后统一重取页面里的人物图：先预载新图，加载完再换 src，避免中间出现空白。
+     子页面（工作台、历史起伏、配置区）都走这里，不用各自再写一份刷新逻辑。 */
+  function reskin(theme) {
+    var t = theme || currentTheme();
+    if (!document.querySelectorAll) return 0;
+    var imgs = document.querySelectorAll("img[data-gb-code]");
+    var n = 0;
+    Array.prototype.forEach.call(imgs, function (img) {
+      var ic = img.getAttribute("data-gb-code");
+      var next = imageFor(ic, t);
+      img.setAttribute("data-gb-pending", next);
+      if (!next || next === img.getAttribute("src")) { img.setAttribute("data-gb-theme", t); return; }
+      img.setAttribute("data-gb-theme", t);
+      n += 1;
+      var probe = typeof window.Image === "function" ? new window.Image() : null;
+      if (!probe) { img.src = next; return; }
+      probe.onload = function () {
+        if (img.getAttribute("data-gb-pending") === next) img.src = next;
+      };
+      probe.src = next;
+    });
+    return n;
+  }
+
+  if (typeof window !== "undefined" && window.addEventListener) {
+    window.addEventListener("gbti-theme-change", function (e) {
+      reskin(e && e.theme ? e.theme : currentTheme());
+    });
   }
 
   /* 数字滚动：从 0 滚到目标值，尊重系统的减少动态偏好。 */
@@ -128,6 +164,7 @@ const GBTI_LOOK = (function () {
     faceSrc: faceSrc,
     avatar: avatar,
     figure: figure,
+    reskin: reskin,
     countUp: countUp,
     reveal: reveal
   };
