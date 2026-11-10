@@ -228,6 +228,15 @@
             <span class="fold-chev" aria-hidden="true"></span>
           </summary>
           <div class="fold-body">
+            <div class="plan-hero" id="plan-hero" hidden>
+              <img class="plan-hero-figure" id="plan-hero-figure" alt="" loading="lazy" decoding="async">
+              <div class="plan-hero-main">
+                <p class="plan-hero-kicker">你的配置偏向</p>
+                <h3 id="plan-hero-name"></h3>
+                <p class="plan-hero-desc" id="plan-hero-desc"></p>
+                <div class="plan-axes" id="plan-hero-axes"></div>
+              </div>
+            </div>
             <div class="plan-actions">
               <button id="plan-copy" class="pill-button" type="button">复制整套方案</button>
               <button id="plan-ask" class="pill-button" type="button">问 AI 为什么这样配</button>
@@ -237,14 +246,15 @@
             <div class="plan-grid">
             <article class="card plan-allocation">
               <div class="plan-card-head">
-                <h3>四类资产比例</h3>
-                <span class="plan-tipchip">点任意一块查看</span>
+                <h3>一万块怎么分</h3>
+                <span class="plan-tipchip">点任意一块看明细</span>
               </div>
+              <p class="plan-sub">以 10,000 元为例，按比例拆成四份。</p>
               <div class="plan-donut-wrap">
                 <canvas id="plan-donut" width="360" height="360" role="img" aria-label="四类资产比例环形图，点击扇区可查看对应类别"></canvas>
                 <div class="plan-donut-center" aria-hidden="true">
-                  <strong id="plan-equity">--</strong>
-                  <span id="plan-donut-label">权益类</span>
+                  <strong id="plan-equity">¥10,000</strong>
+                  <span id="plan-donut-label">示例总额 · 四类合计</span>
                 </div>
               </div>
               <ul id="plan-bars" class="plan-bars"></ul>
@@ -263,10 +273,23 @@
                 <span class="plan-tipchip">与左侧联动</span>
               </div>
               <ul id="plan-vehicles" class="plan-vehicles"></ul>
+              <div class="pv-equity-note" id="plan-equity-note" hidden>
+                <strong id="plan-equity-share"></strong>
+                <p>下方标的用于说明权益类的配置方向。</p>
+                <button class="pv-jump" id="plan-stocks-jump" type="button">看下方标的 ↓</button>
+              </div>
+              <div class="pv-balance">
+                <p class="pv-balance-title">进攻 / 防守</p>
+                <div class="pv-balance-bar" aria-hidden="true"><i id="plan-offense-bar"></i></div>
+                <div class="pv-balance-legend">
+                  <span id="plan-offense-label"></span>
+                  <span id="plan-defense-label"></span>
+                </div>
+              </div>
             </article>
           </div>
 
-          <article class="card plan-stocks">
+          <article class="card plan-stocks" id="plan-stocks" tabindex="-1">
             <div class="plan-card-head">
               <h3>与你风格相符的标的示例</h3>
               <div class="plan-tools">

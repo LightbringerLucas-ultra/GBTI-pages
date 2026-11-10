@@ -1,6 +1,6 @@
 /**
  * 资产配置建议渲染与交互。与 radar.js 同级，只负责把 allocation.js 算出的结果画到页面上。
- * 所有数字都来自 allocation.js 的规则表，本文件不生成任何新的比例或标的，只负责呈现与排序。
+ * 比例与标的来自 allocation.js，示例金额按比例换算。
  * 配色从 CSS 变量读取，以便深浅主题自动切换。
  */
 (function () {
@@ -25,6 +25,11 @@
   ];
 
   const SORT_NAME = { score: "匹配度", pePct: "估值分位", amount: "成交额" };
+  const SAMPLE_TOTAL = 10000;
+
+  function moneyText(pct) {
+    return "¥" + (pct * SAMPLE_TOTAL / 100).toLocaleString("en-US");
+  }
 
   function palette() {
     const cs = getComputedStyle(document.documentElement);
@@ -150,8 +155,8 @@
 
     const value = $("plan-equity");
     const label = $("plan-donut-label");
-    if (value) value.textContent = sleeve ? sleeve.pct + "%" : equityPctText();
-    if (label) label.textContent = sleeve ? sleeve.name : "权益类";
+    if (value) value.textContent = moneyText(sleeve ? sleeve.pct : 100);
+    if (label) label.textContent = sleeve ? sleeve.name + " " + sleeve.pct + "%" : "示例总额 · 四类合计";
 
     document.querySelectorAll(".plan-bar").forEach(function (li) {
       li.classList.toggle("is-on", li.dataset.sleeve === highlight);
@@ -172,6 +177,44 @@
 
   /* ---------- 各区块 ---------- */
 
+  function refreshHeroImage() {
+    const figure = $("plan-hero-figure");
+    const entry = characterImages[figure.dataset.imageCode];
+    if (entry) {
+      const src = themedImageSrc(entry);
+      if (figure.getAttribute("src") !== src) figure.src = src;
+    }
+  }
+
+  function renderHero(outcome) {
+    const persona = outcome.personality;
+    $("plan-hero").hidden = !persona;
+    if (!persona) return;
+    $("plan-hero-figure").dataset.imageCode = persona.imageCode;
+    refreshHeroImage();
+    $("plan-hero-name").textContent = persona.name + "　" + persona.code;
+    $("plan-hero-desc").textContent = persona.motto;
+    $("plan-hero-axes").innerHTML = dimensions.map(function (dimension) {
+      const left = outcome.scores[dimension.left];
+      const right = outcome.scores[dimension.right];
+      const share = Math.round(left / (left + right) * 100);
+      return '<div class="plan-axis">' +
+        '<div class="plan-axis-label"><span>' + dimension.leftName + ' <b>' + left + '</b></span>' +
+        '<span><b>' + right + '</b> ' + dimension.rightName + '</span></div>' +
+        '<span class="plan-axis-track" aria-hidden="true"><i style="width:' + share + '%"></i></span></div>';
+    }).join("");
+  }
+
+  function renderAllocation(plan) {
+    renderBars(plan.allocation);
+    const equity = plan.allocation.find(function (sleeve) { return sleeve.key === "equity"; });
+    $("plan-equity-note").hidden = !plan.stocks.length;
+    $("plan-equity-share").textContent = "权益类 · " + equity.pct + "%";
+    $("plan-offense-bar").style.width = equity.pct + "%";
+    $("plan-offense-label").textContent = "进攻 " + equity.pct + "%";
+    $("plan-defense-label").textContent = "防守 " + (100 - equity.pct) + "%";
+  }
+
   function renderBars(allocation) {
     const box = $("plan-bars");
     if (!box) return;
@@ -185,17 +228,19 @@
       btn.className = "pb-btn";
       btn.type = "button";
       btn.setAttribute("aria-pressed", "false");
-      btn.setAttribute("aria-label", sleeve.name + " " + sleeve.pct + "%，点击查看对应载体");
+      btn.setAttribute("aria-label", sleeve.name + " " + moneyText(sleeve.pct) + "，占 " + sleeve.pct + "%");
 
       const head = document.createElement("span");
       head.className = "pb-head";
+      const dot = document.createElement("span");
+      dot.className = "pb-dot";
       const name = document.createElement("span");
       name.className = "pb-name";
       name.textContent = sleeve.name;
-      const pct = document.createElement("strong");
-      pct.className = "pb-pct";
-      pct.textContent = sleeve.pct + "%";
-      head.append(name, pct);
+      const money = document.createElement("strong");
+      money.className = "pb-money";
+      money.textContent = moneyText(sleeve.pct);
+      head.append(dot, name, money);
 
       const track = document.createElement("span");
       track.className = "pb-track";
@@ -206,7 +251,12 @@
 
       const note = document.createElement("span");
       note.className = "pb-note";
-      note.textContent = sleeve.note;
+      const noteText = document.createElement("span");
+      noteText.textContent = sleeve.note;
+      const pct = document.createElement("strong");
+      pct.className = "pb-pct";
+      pct.textContent = sleeve.pct + "%";
+      note.append(noteText, pct);
 
       btn.append(head, track, note);
       btn.addEventListener("click", function () {
@@ -522,7 +572,7 @@
       }
       : null;
 
-    renderBars(basePlan.allocation);
+    renderAllocation(basePlan);
     renderTweaks();
     syncHighlight();
 
@@ -705,7 +755,8 @@
     const stocksLead = $("plan-stocks-lead");
     if (stocksLead) stocksLead.textContent = stocksLeadText();
 
-    renderBars(plan.allocation);
+    renderHero(outcome);
+    renderAllocation(plan);
     renderVehicles(plan);
     renderTweaks();
     renderStocks(plan);
@@ -726,12 +777,20 @@
         }
       };
     }
+    $("plan-stocks-jump").onclick = function () {
+      const stocks = $("plan-stocks");
+      stocks.focus();
+      stocks.scrollIntoView({ block: "start" });
+    };
     bindDonut();
     return true;
   }
 
   function refresh() {
-    if (basePlan) drawDonut($("plan-donut"), basePlan.allocation);
+    if (basePlan) {
+      refreshHeroImage();
+      drawDonut($("plan-donut"), basePlan.allocation);
+    }
   }
 
   function hide() {

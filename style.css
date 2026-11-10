@@ -407,6 +407,25 @@ html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
 .plan-section { margin-top: var(--space-6); }
 .plan-section > .section-heading { margin-bottom: var(--space-5); }
 
+.plan-hero:not([hidden]) {
+  display: grid; grid-template-columns: 128px minmax(0, 1fr); align-items: center;
+  gap: 18px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--surface-muted), var(--surface) 65%);
+}
+.plan-hero-figure { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: var(--radius-sm); }
+.plan-hero-kicker { margin: 0 0 4px; font-size: 11px; letter-spacing: .16em; color: var(--red); font-weight: 700; }
+.plan-hero-main h3 { margin: 0 0 6px; font-size: 20px; }
+.plan-hero-desc { margin: 0 0 12px; font-size: 13px; color: var(--muted); }
+.plan-axes { display: grid; gap: 8px; }
+.plan-axis-label { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--muted); }
+.plan-axis-label b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.plan-axis-track { display: block; height: 7px; margin-top: 3px; border-radius: var(--radius-pill); overflow: hidden; background: var(--red); }
+.plan-axis-track i { display: block; height: 100%; background: var(--line-strong); }
+@media (max-width: 620px) {
+  .plan-hero:not([hidden]) { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; padding: 12px; }
+  .plan-hero-main h3 { font-size: 17px; }
+}
+
 .plan-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
 .plan-actions .pill-button { padding: 8px 14px; font-size: 13px; }
 .plan-actions .pill-button[hidden] { display: none; }
@@ -419,6 +438,7 @@ html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
   flex-wrap: wrap; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4);
 }
 .plan-card-head h3 { font-size: 18px; margin: 0; }
+.plan-sub { margin: 0 0 var(--space-3); font-size: 12.5px; color: var(--muted); }
 .plan-tipchip {
   font-size: 11.5px; color: var(--faint); white-space: nowrap;
   border: 1px dashed var(--line-strong); border-radius: var(--radius-pill); padding: 2px 10px;
@@ -431,8 +451,8 @@ html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
   position: absolute; inset: 0; display: flex; flex-direction: column;
   align-items: center; justify-content: center; pointer-events: none;
 }
-.plan-donut-center strong { font-size: 30px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
-.plan-donut-center span { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.plan-donut-center strong { font-size: 22px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+.plan-donut-center span { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 
 /* 比例条，整条可点 */
 .plan-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
@@ -443,20 +463,18 @@ html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
 }
 .plan-bar .pb-btn:hover { background: var(--paper-2); }
 .plan-bar.is-on .pb-btn { background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 30%, transparent); }
-.plan-bar .pb-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+.plan-bar .pb-head { display: flex; align-items: center; gap: 8px; }
+.plan-bar .pb-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--sleeve-color); }
 .plan-bar .pb-name { font-size: 14.5px; color: var(--ink); }
-.plan-bar .pb-pct { font-size: 17px; font-variant-numeric: tabular-nums; }
+.plan-bar .pb-money { margin-left: auto; font-size: 17px; font-variant-numeric: tabular-nums; color: var(--ink-strong); }
+.plan-bar .pb-pct { flex: none; font-variant-numeric: tabular-nums; color: var(--sleeve-color); }
 .plan-bar .pb-track { display: block; height: 8px; background: var(--line); border-radius: var(--radius-pill); overflow: hidden; margin: 6px 0; }
-.plan-bar .pb-fill { display: block; height: 100%; border-radius: var(--radius-pill); transition: width 600ms var(--ease); }
-.plan-bar .pb-note { display: block; font-size: 12.5px; color: var(--muted); }
-.plan-bar[data-sleeve="equity"] .pb-fill { background: var(--c-equity); }
-.plan-bar[data-sleeve="bond"] .pb-fill { background: var(--c-bond); }
-.plan-bar[data-sleeve="money"] .pb-fill { background: var(--c-money); }
-.plan-bar[data-sleeve="gold"] .pb-fill { background: var(--c-gold); }
-.plan-bar[data-sleeve="equity"] .pb-pct { color: var(--c-equity); }
-.plan-bar[data-sleeve="bond"] .pb-pct { color: var(--c-bond); }
-.plan-bar[data-sleeve="money"] .pb-pct { color: var(--c-money); }
-.plan-bar[data-sleeve="gold"] .pb-pct { color: var(--c-gold); }
+.plan-bar .pb-fill { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--sleeve-color); transition: width 600ms var(--ease); }
+.plan-bar .pb-note { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 12.5px; color: var(--muted); }
+.plan-bar[data-sleeve="equity"] { --sleeve-color: var(--c-equity); }
+.plan-bar[data-sleeve="bond"] { --sleeve-color: var(--c-bond); }
+.plan-bar[data-sleeve="money"] { --sleeve-color: var(--c-money); }
+.plan-bar[data-sleeve="gold"] { --sleeve-color: var(--c-gold); }
 
 /* 情景微调 */
 .plan-tweak { margin-top: var(--space-5); border-top: 1px dashed var(--line); padding-top: var(--space-4); }
@@ -494,6 +512,23 @@ html:is([data-theme="dark"], [data-theme="halloween"], [data-theme="christmas"],
 .plan-vehicle .pv-top strong { font-size: 15px; }
 .plan-vehicle .pv-code { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .plan-vehicle .pv-why { margin: 6px 0 0; font-size: 13px; color: var(--muted); line-height: 1.7; }
+.pv-equity-note, .pv-balance {
+  margin-top: var(--space-3); padding: 13px 15px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+}
+.pv-equity-note { background: var(--surface-muted); border-style: dashed; }
+.pv-equity-note strong { font-size: 13.5px; }
+.pv-equity-note p { margin: 5px 0 9px; font-size: 12.5px; color: var(--muted); }
+.pv-jump {
+  border: 0; border-bottom: 1px solid currentColor; background: transparent; padding: 0; cursor: pointer;
+  font: inherit; font-size: 12.5px; font-weight: 700; color: var(--red);
+}
+.pv-balance-title { margin: 0 0 9px; font-size: 12.5px; font-weight: 700; }
+.pv-balance-bar { height: 12px; border-radius: var(--radius-pill); overflow: hidden; background: var(--c-bond); }
+.pv-balance-bar i { display: block; height: 100%; background: var(--c-equity); }
+.pv-balance-legend {
+  display: flex; justify-content: space-between; margin-top: 7px;
+  font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
 
 /* 标的列表 */
 .plan-stocks { margin-top: var(--space-4); }
