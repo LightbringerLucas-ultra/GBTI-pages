@@ -534,8 +534,8 @@ function openDialog(selector) {
 
 /* ---------- 主题（皮肤商城） ---------- */
 
-// 每次打开默认亮色模式；顶栏按钮打开皮肤商城，皮肤切换仅作用于本次页面。
-const THEMES = ["light", "dark", "halloween", "christmas", "spring", "qingming", "midautumn", "nailong"];
+// 顶栏按钮打开皮肤商城，皮肤通过共用存储跨页面同步。
+const THEMES = ["light", "dark", "halloween", "christmas", "spring", "qingming", "midautumn", "nailong", "chiikawa", "usagi", "hachiware"];
 const THEME_META = {
   light: { label: "亮色", color: "#f7f3eb", icon: "☀️", desc: "默认的纸感米白，清爽耐看。", swatches: ["#f7f3eb", "#c44236", "#6b8f71"] },
   dark: { label: "暗色", color: "#16140f", icon: "🌙", desc: "纯暗夜色，深夜刷题不刺眼。", swatches: ["#16140f", "#e07362", "#61b98a"] },
@@ -544,7 +544,10 @@ const THEME_META = {
   spring: { label: "春节", color: "#1c1013", icon: "🧨", desc: "红火庙会夜，人格画像换成新春贺岁版。", swatches: ["#1c1013", "#e8544a", "#e6b34d"] },
   qingming: { label: "清明", color: "#f2f5ee", icon: "🌿", desc: "烟雨踏青，清新的浅色春日。", swatches: ["#f2f5ee", "#47836b", "#8fb8a0"] },
   midautumn: { label: "中秋", color: "#101623", icon: "🌕", desc: "靛蓝月夜桂花香，人格画像换成中秋赏月版。", swatches: ["#101623", "#e3b84f", "#7aa88f"] },
-  nailong: { label: "奶龙", color: "#fff8df", icon: "💛", desc: "奶油黄的暖暖世界，16 种人格与开屏群像一起变身奶龙。", swatches: ["#fff8df", "#ffd447", "#9a640e"] }
+  nailong: { label: "奶龙", color: "#fff8df", icon: "💛", desc: "奶油黄的暖暖世界，16 种人格与开屏群像一起变身奶龙。", swatches: ["#fff8df", "#ffd447", "#9a640e"] },
+  chiikawa: { label: "吉伊卡哇", color: "#fbf6ef", icon: "🤍", desc: "软乎乎的奶油白世界，16 种人格与开屏群像一起变身吉伊卡哇。", swatches: ["#fbf6ef", "#f2b8c0", "#7fbf9e"] },
+  usagi: { label: "乌萨奇", color: "#fdf3d7", icon: "🐰", desc: "明快鹅黄的元气世界，16 种人格与开屏群像一起变身乌萨奇。", swatches: ["#fdf3d7", "#f6c445", "#e88f3a"] },
+  hachiware: { label: "小八", color: "#eef4fb", icon: "💙", desc: "清爽的蓝白世界，16 种人格与开屏群像一起变身小八。", swatches: ["#eef4fb", "#6b9fd4", "#3f6491"] }
 };
 
 function currentTheme() {

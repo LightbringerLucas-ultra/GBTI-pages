@@ -8,6 +8,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/CONTR.webp",
     "midautumn": "assets/display/midautumn/CONTR.webp",
     "nailong": "assets/display/nailong/CONTR.jpg",
+    "chiikawa": "assets/display/chiikawa/CONTR.jpg",
+    "usagi": "assets/display/usagi/CONTR.jpg",
+    "hachiware": "assets/display/hachiware/CONTR.jpg",
     "original": "assets/original/CONTR.png"
   },
   "DATA": {
@@ -18,6 +21,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/DATA.webp",
     "midautumn": "assets/display/midautumn/DATA.webp",
     "nailong": "assets/display/nailong/DATA.jpg",
+    "chiikawa": "assets/display/chiikawa/DATA.jpg",
+    "usagi": "assets/display/usagi/DATA.jpg",
+    "hachiware": "assets/display/hachiware/DATA.jpg",
     "original": "assets/original/DATA.png"
   },
   "DIVE": {
@@ -28,6 +34,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/DIVE.webp",
     "midautumn": "assets/display/midautumn/DIVE.webp",
     "nailong": "assets/display/nailong/DIVE.png",
+    "chiikawa": "assets/display/chiikawa/DIVE.jpg",
+    "usagi": "assets/display/usagi/DIVE.jpg",
+    "hachiware": "assets/display/hachiware/DIVE.jpg",
     "original": "assets/original/DIVE.png"
   },
   "DIVI": {
@@ -38,6 +47,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/DIVI.webp",
     "midautumn": "assets/display/midautumn/DIVI.webp",
     "nailong": "assets/display/nailong/DIVI.jpg",
+    "chiikawa": "assets/display/chiikawa/DIVI.jpg",
+    "usagi": "assets/display/usagi/DIVI.jpg",
+    "hachiware": "assets/display/hachiware/DIVI.jpg",
     "original": "assets/original/DIVI.png"
   },
   "GROW": {
@@ -48,6 +60,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/GROW.webp",
     "midautumn": "assets/display/midautumn/GROW.webp",
     "nailong": "assets/display/nailong/GROW.jpg",
+    "chiikawa": "assets/display/chiikawa/GROW.jpg",
+    "usagi": "assets/display/usagi/GROW.jpg",
+    "hachiware": "assets/display/hachiware/GROW.jpg",
     "original": "assets/original/GROW.png"
   },
   "HOLD": {
@@ -58,6 +73,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/HOLD.webp",
     "midautumn": "assets/display/midautumn/HOLD.webp",
     "nailong": "assets/display/nailong/HOLD.jpg",
+    "chiikawa": "assets/display/chiikawa/HOLD.jpg",
+    "usagi": "assets/display/usagi/HOLD.jpg",
+    "hachiware": "assets/display/hachiware/HOLD.jpg",
     "original": "assets/original/HOLD.png"
   },
   "HYPE": {
@@ -68,6 +86,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/HYPE.webp",
     "midautumn": "assets/display/midautumn/HYPE.webp",
     "nailong": "assets/display/nailong/HYPE.jpg",
+    "chiikawa": "assets/display/chiikawa/HYPE.jpg",
+    "usagi": "assets/display/usagi/HYPE.jpg",
+    "hachiware": "assets/display/hachiware/HYPE.jpg",
     "original": "assets/original/HYPE.png"
   },
   "LEVER": {
@@ -78,6 +99,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/LEVER.webp",
     "midautumn": "assets/display/midautumn/LEVER.webp",
     "nailong": "assets/display/nailong/LEVER.jpg",
+    "chiikawa": "assets/display/chiikawa/LEVER.jpg",
+    "usagi": "assets/display/usagi/LEVER.jpg",
+    "hachiware": "assets/display/hachiware/LEVER.jpg",
     "original": "assets/original/LEVER.png"
   },
   "LONG": {
@@ -88,6 +112,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/LONG.webp",
     "midautumn": "assets/display/midautumn/LONG.webp",
     "nailong": "assets/display/nailong/LONG.jpg",
+    "chiikawa": "assets/display/chiikawa/LONG.jpg",
+    "usagi": "assets/display/usagi/LONG.jpg",
+    "hachiware": "assets/display/hachiware/LONG.jpg",
     "original": "assets/original/LONG.png"
   },
   "MACRO": {
@@ -98,6 +125,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/MACRO.webp",
     "midautumn": "assets/display/midautumn/MACRO.webp",
     "nailong": "assets/display/nailong/MACRO.jpg",
+    "chiikawa": "assets/display/chiikawa/MACRO.jpg",
+    "usagi": "assets/display/usagi/MACRO.jpg",
+    "hachiware": "assets/display/hachiware/MACRO.jpg",
     "original": "assets/original/MACRO.png"
   },
   "SCALP": {
@@ -108,6 +138,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/SCALP.webp",
     "midautumn": "assets/display/midautumn/SCALP.webp",
     "nailong": "assets/display/nailong/SCALP.jpg",
+    "chiikawa": "assets/display/chiikawa/SCALP.jpg",
+    "usagi": "assets/display/usagi/SCALP.jpg",
+    "hachiware": "assets/display/hachiware/SCALP.jpg",
     "original": "assets/original/SCALP.png"
   },
   "SECT": {
@@ -118,6 +151,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/SECT.webp",
     "midautumn": "assets/display/midautumn/SECT.webp",
     "nailong": "assets/display/nailong/SECT.jpg",
+    "chiikawa": "assets/display/chiikawa/SECT.jpg",
+    "usagi": "assets/display/usagi/SECT.jpg",
+    "hachiware": "assets/display/hachiware/SECT.jpg",
     "original": "assets/original/SECT.png"
   },
   "SWING": {
@@ -128,6 +164,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/SWING.webp",
     "midautumn": "assets/display/midautumn/SWING.webp",
     "nailong": "assets/display/nailong/SWING.jpg",
+    "chiikawa": "assets/display/chiikawa/SWING.jpg",
+    "usagi": "assets/display/usagi/SWING.jpg",
+    "hachiware": "assets/display/hachiware/SWING.jpg",
     "original": "assets/original/SWING.png"
   },
   "TECH": {
@@ -138,6 +177,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/TECH.webp",
     "midautumn": "assets/display/midautumn/TECH.webp",
     "nailong": "assets/display/nailong/TECH.jpg",
+    "chiikawa": "assets/display/chiikawa/TECH.jpg",
+    "usagi": "assets/display/usagi/TECH.jpg",
+    "hachiware": "assets/display/hachiware/TECH.jpg",
     "original": "assets/original/TECH.png"
   },
   "TREND": {
@@ -148,6 +190,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/TREND.webp",
     "midautumn": "assets/display/midautumn/TREND.webp",
     "nailong": "assets/display/nailong/TREND.jpg",
+    "chiikawa": "assets/display/chiikawa/TREND.jpg",
+    "usagi": "assets/display/usagi/TREND.jpg",
+    "hachiware": "assets/display/hachiware/TREND.jpg",
     "original": "assets/original/TREND.png"
   },
   "VALU": {
@@ -158,6 +203,9 @@ const characterImages = {
     "qingming": "assets/display/qingming/VALU.webp",
     "midautumn": "assets/display/midautumn/VALU.webp",
     "nailong": "assets/display/nailong/VALU.jpg",
+    "chiikawa": "assets/display/chiikawa/VALU.jpg",
+    "usagi": "assets/display/usagi/VALU.jpg",
+    "hachiware": "assets/display/hachiware/VALU.jpg",
     "original": "assets/original/VALU.png"
   }
 };

@@ -7,7 +7,7 @@
   "use strict";
 
   var KEY = "gbti-theme-v1";
-  var THEMES = ["light", "dark", "halloween", "christmas", "spring", "qingming", "midautumn", "nailong"];
+  var THEMES = ["light", "dark", "halloween", "christmas", "spring", "qingming", "midautumn", "nailong", "chiikawa", "usagi", "hachiware"];
   var META = {
     light:     { label: "亮色",   icon: "☀️", color: "#f7f3eb", dark: false },
     dark:      { label: "暗色",   icon: "🌙", color: "#16140f", dark: true  },
@@ -16,7 +16,10 @@
     spring:    { label: "春节",   icon: "🧨", color: "#1c1013", dark: true  },
     qingming:  { label: "清明",   icon: "🌿", color: "#f2f5ee", dark: false },
     midautumn: { label: "中秋",   icon: "🌕", color: "#101623", dark: true  },
-    nailong:   { label: "奶龙",   icon: "💛", color: "#fff8df", dark: false }
+    nailong:   { label: "奶龙",   icon: "💛", color: "#fff8df", dark: false },
+    chiikawa:  { label: "吉伊卡哇", icon: "🤍", color: "#fbf6ef", dark: false },
+    usagi:     { label: "乌萨奇", icon: "🐰", color: "#fdf3d7", dark: false },
+    hachiware: { label: "小八", icon: "💙", color: "#eef4fb", dark: false }
   };
 
   function valid(t) { return THEMES.indexOf(t) >= 0 ? t : null; }

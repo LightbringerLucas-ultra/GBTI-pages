@@ -1296,6 +1296,9 @@ html[data-theme="spring"] #theme-toggle .theme-firecracker { display: block; }
 html[data-theme="qingming"] #theme-toggle .theme-willow { display: block; }
 html[data-theme="midautumn"] #theme-toggle .theme-moon { display: block; }
 html[data-theme="nailong"] #theme-toggle .theme-nailong { display: block; }
+html[data-theme="chiikawa"] #theme-toggle .theme-chiikawa { display: block; }
+html[data-theme="usagi"] #theme-toggle .theme-usagi { display: block; }
+html[data-theme="hachiware"] #theme-toggle .theme-hachiware { display: block; }
 
 /* 奶龙模式：奶油黄底色、明黄按钮和暖棕文字。 */
 html[data-theme="nailong"] {
@@ -1329,6 +1332,105 @@ html[data-theme="nailong"] .hero-card { background: linear-gradient(135deg, #fff
 html[data-theme="nailong"] .tags span { border: 1px solid #ebd497; }
 html[data-theme="nailong"] :is(.character-image, .personality-tile img, .pm-hero img) { border-radius: 16px; }
 html[data-theme="nailong"] .skin-card.is-current { background: #fff3c6; }
+
+/* 吉伊卡哇模式：奶油白底、软粉与薄荷绿点缀。 */
+html[data-theme="chiikawa"] {
+  color-scheme: light;
+  --red: #d9707e; --red-deep: #b04b5c; --red-soft: #fbe3e6;
+  --green: #4e9a78; --hero-accent: #d9707e; --hero-soft: #e9f5ef;
+  --paper: #fbf6ef; --paper-2: #ffffff;
+  --surface: #fffefd; --surface-muted: #f4ede2;
+  --ink: #4b3f3a; --ink-strong: #2e2420;
+  --muted: #8a7a72; --faint: #a8948a;
+  --line: #ecdfd3; --line-strong: #d9c4b2;
+  --shadow-sm: 0 2px 8px rgba(140, 110, 90, 0.08);
+  --shadow-md: 0 10px 30px rgba(140, 110, 90, 0.12);
+  --shadow-lg: 0 24px 60px rgba(140, 110, 90, 0.18);
+}
+.landing-art-chiikawa { display: none; }
+html[data-theme="chiikawa"] .landing-art-day { display: none; }
+html[data-theme="chiikawa"] .landing-art-chiikawa { display: block; }
+html[data-theme="chiikawa"] .landing-hero { background: #f3efe6; }
+html[data-theme="chiikawa"] .aurora span:nth-child(1) { background: rgba(242, 184, 192, 0.25); }
+html[data-theme="chiikawa"] .aurora span:nth-child(2) { background: rgba(158, 216, 190, 0.25); }
+html[data-theme="chiikawa"] .aurora span:nth-child(3) { background: rgba(246, 214, 218, 0.18); }
+html[data-theme="chiikawa"] .button-primary {
+  background: #f2b8c0; color: #5c3038;
+  box-shadow: 0 6px 20px rgba(217, 112, 126, 0.2);
+}
+html[data-theme="chiikawa"] .button-primary:hover { background: #efa9b3; }
+html[data-theme="chiikawa"] .landing-start { border: 2px solid #e8a1ac; }
+html[data-theme="chiikawa"] .ai-fab { background: linear-gradient(135deg, #f6ccd2, #eeb0ba); color: #5c3038; }
+html[data-theme="chiikawa"] .hero-card { background: linear-gradient(135deg, #fffdfa, #fdeef0); }
+html[data-theme="chiikawa"] .tags span { border: 1px solid #eccfd4; }
+html[data-theme="chiikawa"] :is(.character-image, .personality-tile img, .pm-hero img) { border-radius: 16px; }
+html[data-theme="chiikawa"] .skin-card.is-current { background: #fdeef0; }
+
+/* 乌萨奇模式：明快鹅黄底色、橙黄按钮和暖棕文字。 */
+html[data-theme="usagi"] {
+  color-scheme: light;
+  --red: #c26a1b; --red-deep: #9a4f0e; --red-soft: #fdeacc;
+  --green: #4e8f5a; --hero-accent: #c26a1b; --hero-soft: #fdf0cd;
+  --paper: #fdf3d7; --paper-2: #fffaf0;
+  --surface: #fffdf6; --surface-muted: #fceec9;
+  --ink: #4d3a14; --ink-strong: #33250a;
+  --muted: #85703d; --faint: #a08b55;
+  --line: #f0dfae; --line-strong: #dfc27a;
+  --shadow-sm: 0 2px 8px rgba(160, 118, 26, 0.08);
+  --shadow-md: 0 10px 30px rgba(160, 118, 26, 0.12);
+  --shadow-lg: 0 24px 60px rgba(160, 118, 26, 0.18);
+}
+.landing-art-usagi { display: none; }
+html[data-theme="usagi"] .landing-art-day { display: none; }
+html[data-theme="usagi"] .landing-art-usagi { display: block; }
+html[data-theme="usagi"] .landing-hero { background: #fdf3d7; }
+html[data-theme="usagi"] .aurora span:nth-child(1) { background: rgba(246, 196, 69, 0.25); }
+html[data-theme="usagi"] .aurora span:nth-child(2) { background: rgba(250, 224, 140, 0.25); }
+html[data-theme="usagi"] .aurora span:nth-child(3) { background: rgba(232, 143, 58, 0.14); }
+html[data-theme="usagi"] .button-primary {
+  background: #f6c445; color: #4d3005;
+  box-shadow: 0 6px 20px rgba(194, 122, 26, 0.2);
+}
+html[data-theme="usagi"] .button-primary:hover { background: #f2b936; }
+html[data-theme="usagi"] .landing-start { border: 2px solid #eeb335; }
+html[data-theme="usagi"] .ai-fab { background: linear-gradient(135deg, #fad97a, #f2bb3c); color: #4d3005; }
+html[data-theme="usagi"] .hero-card { background: linear-gradient(135deg, #fffdf6, #fdeec3); }
+html[data-theme="usagi"] .tags span { border: 1px solid #ecd492; }
+html[data-theme="usagi"] :is(.character-image, .personality-tile img, .pm-hero img) { border-radius: 16px; }
+html[data-theme="usagi"] .skin-card.is-current { background: #fdf0cd; }
+
+/* 小八皮肤：清爽蓝白，16 人格与开屏群像换成小八（蓝白猫）版。 */
+html[data-theme="hachiware"] {
+  color-scheme: light;
+  --red: #3f6491; --red-deep: #2e4a6b; --red-soft: #dcecfa;
+  --green: #4e8f6a; --hero-accent: #3f6491; --hero-soft: #dcebfb;
+  --paper: #eef4fb; --paper-2: #f7fbff;
+  --surface: #fbfdff; --surface-muted: #e2edf9;
+  --ink: #24364a; --ink-strong: #16222f;
+  --muted: #5c7590; --faint: #829cb5;
+  --line: #cfdff0; --line-strong: #a9c4e0;
+  --shadow-sm: 0 2px 8px rgba(63, 100, 145, 0.08);
+  --shadow-md: 0 10px 30px rgba(63, 100, 145, 0.12);
+  --shadow-lg: 0 24px 60px rgba(63, 100, 145, 0.18);
+}
+.landing-art-hachiware { display: none; }
+html[data-theme="hachiware"] .landing-art-day { display: none; }
+html[data-theme="hachiware"] .landing-art-hachiware { display: block; }
+html[data-theme="hachiware"] .landing-hero { background: #eef4fb; }
+html[data-theme="hachiware"] .aurora span:nth-child(1) { background: rgba(107, 159, 212, 0.25); }
+html[data-theme="hachiware"] .aurora span:nth-child(2) { background: rgba(158, 197, 232, 0.25); }
+html[data-theme="hachiware"] .aurora span:nth-child(3) { background: rgba(63, 100, 145, 0.12); }
+html[data-theme="hachiware"] .button-primary {
+  background: #5b93cf; color: #ffffff;
+  box-shadow: 0 6px 20px rgba(63, 100, 145, 0.22);
+}
+html[data-theme="hachiware"] .button-primary:hover { background: #4f87c2; }
+html[data-theme="hachiware"] .landing-start { border: 2px solid #7db3e8; }
+html[data-theme="hachiware"] .ai-fab { background: linear-gradient(135deg, #a9cdec, #7db3e8); color: #1d3448; }
+html[data-theme="hachiware"] .hero-card { background: linear-gradient(135deg, #fdfeff, #e2eefb); }
+html[data-theme="hachiware"] .tags span { border: 1px solid #c4d9ee; }
+html[data-theme="hachiware"] :is(.character-image, .personality-tile img, .pm-hero img) { border-radius: 16px; }
+html[data-theme="hachiware"] .skin-card.is-current { background: #e2eefb; }
 
 /* 春节模式：红火庙会夜，灯笼烟花。 */
 html[data-theme="spring"] {
