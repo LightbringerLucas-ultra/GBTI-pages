@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f7f3ed">
+  <title>安卓收款通知验证 · GBTI</title>
+  <style>
+    :root{color-scheme:light;--paper:#f7f3ed;--card:#fffcf7;--ink:#2b2f2c;--muted:#6c726c;--red:#bf4c3c;--line:#e1d9cc}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;line-height:1.8}main{max-width:880px;margin:auto;padding:38px 24px 64px}a{color:var(--red);text-underline-offset:3px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:16px}header a{text-decoration:none;font-weight:800;letter-spacing:2px}header span{font-size:13px;color:var(--muted)}h1{font-size:clamp(29px,6vw,43px);line-height:1.35;letter-spacing:-1px;margin:12px 0 18px}h2{font-size:21px;margin:0 0 14px}h3{margin:0;font-size:19px}p{margin:10px 0}.muted{color:var(--muted)}.eyebrow{font-size:13px;color:var(--red);font-weight:700;letter-spacing:2px;margin-top:32px}.hero{display:grid;grid-template-columns:1fr 170px;gap:28px;align-items:center;margin-bottom:28px}.lead{max-width:590px}.download{display:inline-block;background:var(--red);color:#fff;text-decoration:none;padding:13px 24px;border-radius:12px;font-weight:700;margin:12px 0 4px;min-height:48px}.download:hover{background:#a94032}.download:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #427568;outline-offset:4px}.meta{font-size:13px}.qr{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center;margin:0}.qr img{display:block;width:144px;height:144px}.qr figcaption{font-size:12px;color:var(--muted);padding-top:6px}.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;margin-top:20px}.notice{border-left:4px solid var(--red);font-size:14px}.steps{padding-left:24px;margin:0}.steps li{padding:5px 0 11px 5px}.steps strong{display:block}.channels{display:grid;grid-template-columns:1fr 1fr;gap:14px}.channel{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}.tag{font-size:12px;display:inline-block;padding:2px 9px;border-radius:20px;background:#f2e6d6;color:#755e36;margin-top:6px}.checks{font-size:14px;color:var(--muted)}details{margin-top:16px;font-size:14px}summary{cursor:pointer;font-weight:650}code{font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all}.footer{font-size:12px;color:var(--muted);padding-top:20px}.small{font-size:14px}@media(max-width:600px){main{padding:24px 18px 40px}.hero{grid-template-columns:1fr;gap:12px}.qr{display:none}.panel{padding:20px}.channels{grid-template-columns:1fr}.download{width:100%;text-align:center}header span{font-size:12px}}
+  </style>
+</head>
+<body><main>
+  <header><a href="index.html">GBTI</a><span>安卓手机 · 本机验证工具</span></header>
+  <div class="eyebrow">第一步，确认通知能被读到</div>
+  <section class="hero">
+    <div class="lead">
+      <h1>收款通知，<br>能到达你的网页吗？</h1>
+      <p class="muted">先在手机上分别验证微信和支付宝：有没有收到通知、能不能读到金额。测试通过后，再接入网页特效。</p>
+      <a class="download" href="downloads/gbti-notification-probe-1.0.0.apk" download>下载安卓安装包 APK</a>
+      <p class="meta muted">v1.0.0 · 约 29 KB · Android 8.0 及以上</p>
+    </div>
+    <figure class="qr"><img src="downloads/notification-probe-qr.svg" alt="用手机扫描，打开本安装页面" width="144" height="144"><figcaption>手机扫码打开此页面</figcaption></figure>
+  </section>
+  <div class="panel notice"><strong>当前进度：已完成打包和模拟规则测试，等待手机实测。</strong><br>安装包没有联网权限。只在你开启的 15 分钟内观察通知，不上传数据；本版本还不会触发网站特效。</div>
+  <section class="panel">
+    <h2>安装后，按这四步来</h2>
+    <ol class="steps">
+      <li><strong>安装并开启「通知使用权」</strong>用手机浏览器下载 APK，按 Android 提示安装。打开「GBTI 收款通知验证」，点第一步进入系统设置，给本工具开启通知使用权，再返回。</li>
+      <li><strong>开始 15 分钟验证，先发模拟通知</strong>点「开始本机验证」，再点「发送两条模拟通知」。下方应出现两条紫色模拟记录。系统若询问发送通知权限，该权限只用于这一步的自测。</li>
+      <li><strong>微信、支付宝各做一次真实扫码收款</strong>用另一账号扫自己的收款码，支付你愿意测试的小额，例如 0.01 元。到各自账单里确认到账，再看本工具候选提醒中的金额，分别记录核对结果。</li>
+      <li><strong>把诊断摘要发回本次对话</strong>点击「复制诊断摘要」。摘要会保留设备、权限、监听状态及分类计数，不包含金额、姓名、通知正文或交易编号。</li>
+    </ol>
+  </section>
+  <section class="panel">
+    <h2>两种收款，分别核对</h2>
+    <div class="channels">
+      <div class="channel"><h3>微信收款码</h3><span class="tag">手机真实收款待测试</span><p class="small">查看「微信」的应用通知、候选到账、金额可读三个计数，并与微信账单核对。</p></div>
+      <div class="channel"><h3>支付宝收款码</h3><span class="tag">手机真实收款待测试</span><p class="small">同样查看「支付宝」独立计数。微信通过不能代替支付宝通过，反之亦然。</p></div>
+    </div>
+    <p class="checks">第一轮成功后，再测锁屏/后台收款、连续两笔同额收款。普通聊天、支出、红包或退款也需要核对是否被排除。通知事件数不等于实际到账笔数。</p>
+  </section>
+  <section class="panel">
+    <h2>OPPO 手机上没读到时</h2>
+    <p class="small">先看「通知使用权：已授权」「监听服务：已连接」。如未连接，点「重新连接监听服务」。必要时按手机设置允许本工具后台运行，并确认微信和支付宝开启到账通知。</p>
+    <p class="small muted">ColorOS 菜单会随系统版本变化。如果出现「受限设置」，使用应用详情内系统提供的入口处理，不关闭系统安全防护。通知正文被隐藏、分身或工作空间不可见，都请保留为测试结果。</p>
+    <details><summary>隐私、权限与验证范围</summary><p>通知使用权是 Android 的特殊授权，系统授权范围较广。本工具先按来源筛选，只处理微信、支付宝和自己的模拟通知。最多在本机保留 100 条诊断元数据与候选金额，不保存原始通知正文、付款人姓名或交易编号。</p><p>没有联网、相机、联系人或无障碍权限。发送通知权限仅用于模拟测试。你可以停止、清空记录，或在系统设置撤销通知使用权。</p><p>到账通知是候选信号，可能被合并、隐藏或误识别，不能代替支付平台确认。请以实际账单为准；个人收款码的通知也不能单独证明付款来自本网站。</p></details>
+    <details><summary>安装包校验与已完成检查</summary><p>包名：<code>app.gbti.receiptprobe</code>。APK 签名与权限检查通过，27 项模拟规则与事件标识断言通过；未在你的手机上运行过。</p><p>SHA-256：<br><code>969c0815d3364bc6293152cedaff639248867901c8ecc67eb9d61f6c171c9277</code></p><a href="downloads/gbti-notification-probe-1.0.0.apk.sha256">下载校验值</a></details>
+  </section>
+  <p class="footer">GBTI · 本机通知验证 1.0.0 · 2026-11-10<br>技术依据：<a href="https://developer.android.com/reference/android/service/notification/NotificationListenerService" target="_blank" rel="noopener noreferrer">Android 通知监听服务</a></p>
+</main></body>
+</html>
