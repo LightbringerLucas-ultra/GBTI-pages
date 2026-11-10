@@ -1,4 +1,4 @@
-/* GBTI 今日市场人格：首页横条 + 展开对照弹窗
+/* GBTI 市场牛熊：结果页横条 + 展开对照弹窗
    配色走主站令牌，涨用红、跌用绿，跟随皮肤。 */
 
 .mm, .mm-modal {
@@ -11,9 +11,8 @@
   --mm-accent-soft: color-mix(in srgb, var(--green) 10%, var(--surface));
 }
 .mm { margin: 0 0 16px; }
-html.on-subpage .mm { display: none; }
 
-/* ---------- 首页横条 ---------- */
+/* ---------- 结果页横条 ---------- */
 .mm-band {
   display: flex; align-items: center; gap: 16px; width: 100%;
   padding: 12px 18px 12px 12px;
