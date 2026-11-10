@@ -1797,12 +1797,14 @@ html[data-theme="midautumn"] .personality-tile img { border-radius: 12px; }
   border-radius: 18px;
   padding: 18px;
   max-width: min(340px, 86vw);
+  max-height: calc(100dvh - 36px);
+  overflow-y: auto;
   text-align: center;
   box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
   animation: donate-pop .18s ease-out;
 }
 @keyframes donate-pop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.donate-card img { width: 100%; border-radius: 12px; display: block; }
+.donate-card img { width: auto; max-width: 100%; max-height: min(58vh, 455px); margin: 0 auto; border-radius: 12px; display: block; }
 .donate-text { margin: 12px 0 14px; font-size: 14px; color: #6b5d4a; line-height: 1.7; }
 .donate-close {
   padding: 8px 28px;
