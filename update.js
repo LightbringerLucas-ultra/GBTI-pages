@@ -337,6 +337,8 @@
   }
 
   function renderBanner() {
+    const panel = $("data-panel");
+    if (!panel) return;
     let banner = $("data-banner");
     const info = marketInfo();
     const stale = info && info.asOf && info.asOf < fmtDate(lastTradingDay());
@@ -349,9 +351,7 @@
       banner = document.createElement("div");
       banner.id = "data-banner";
       banner.className = "data-banner";
-      const topbar = document.querySelector(".topbar");
-      if (topbar && topbar.parentNode) topbar.parentNode.insertBefore(banner, topbar.nextSibling);
-      else document.body.insertBefore(banner, document.body.firstChild);
+      panel.before(banner);
     }
     banner.replaceChildren();
     const text = document.createElement("span");
@@ -363,13 +363,10 @@
     action.type = "button";
     action.textContent = "一键更新";
     action.addEventListener("click", function () {
+      panel.open = true;
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
       if (serviceUp || servedByLocalApi()) { refresh(); return; }
-      // 服务状态未知：展开底部面板并探测一次，探测成功面板里就能直接更新。
-      const panel = $("data-panel");
-      if (panel) {
-        panel.open = true;
-        panel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      // 服务状态未知时先探测，连上后可以在面板里更新。
       (openedFromFile() ? probe() : check()).then(function (up) {
         if (up) setLog("已连上更新服务，点下面的「立即更新行情数据」即可。", "ok");
       });

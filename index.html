@@ -18,7 +18,7 @@
       } catch (error) { /* 无痕模式或存储被禁用时静默跳过。 */ }
     })();
   </script>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=plan-data-fold">
   <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="market-mood.css">
   <link rel="stylesheet" href="metaphysics.css">
@@ -37,18 +37,18 @@
   <script src="allocation.js?v=stock-persona" defer></script>
   <script src="plan.js" defer></script>
   <script src="ai.js" defer></script>
-  <script src="update.js" defer></script>
+  <script src="update.js?v=plan-data-fold" defer></script>
   <script src="news-engine.js" defer></script>
   <script src="news-data.js" defer></script>
   <script src="news.js" defer></script>
   <script src="news-map.js?v=20261110-four-scores" defer></script>
-  <script src="test.js" defer></script>
+  <script src="test.js?v=plan-data-fold" defer></script>
   <!-- 玄学操盘适配度模块（纯新增）：lunar.js 提供黄历，metaphysics.js 提供双维画像 + 适配度 + AI 解读 -->
   <script src="lunar.js" defer></script>
   <script src="metaphysics.js" defer></script>
   <!-- 塔罗映照模块（纯新增）：依赖 metaphysics.js 暴露的 GBTI_XUANXUE.readingFor 做东西合参 -->
   <script src="tarot.js" defer></script>
-  <script src="result-pages.js" defer></script>
+  <script src="result-pages.js?v=plan-data-fold" defer></script>
   <script src="market-mood.js" defer></script>
   <script src="donation-core.js?v=20261110-1" defer></script>
   <script src="donation-effects.js?v=20261110-1" defer></script>
@@ -339,6 +339,64 @@
             <ul id="plan-disclaimer" class="plan-disclaimer is-clamped"></ul>
             <p class="hint" id="plan-data-note"></p>
           </article>
+
+          <details id="data-panel" class="fold-section fold">
+            <summary class="fold-head">
+              <span class="fold-mark" aria-hidden="true">数据</span>
+              <span class="fold-text">
+                <span class="section-kicker">数据维护</span>
+                <span class="fold-title">每日行情数据更新</span>
+                <span class="fold-hint" id="data-fold-hint">正在读取本地快照……</span>
+              </span>
+              <span class="fold-chev" aria-hidden="true"></span>
+            </summary>
+            <div class="fold-body">
+              <div id="data-transport" class="data-transport" hidden></div>
+              <div class="data-status" id="data-status"></div>
+
+              <div class="data-actions">
+                <button id="data-refresh" class="button-secondary" type="button">立即更新行情数据</button>
+                <button id="data-check" class="button-ghost" type="button">检查更新服务</button>
+              </div>
+
+              <label class="field data-endpoint">
+                <span>更新服务地址</span>
+                <input id="data-endpoint" type="text" placeholder="例如 http://127.0.0.1:8765" autocomplete="off" spellcheck="false">
+              </label>
+              <p class="hint">留空则自动判断：网页由本机服务打开时用同一个地址，双击 HTML 打开时自动探测 http://127.0.0.1:8765，能连上按钮就直接可用。</p>
+
+              <div class="data-actions">
+                <button id="data-schedule" class="button-ghost" type="button" hidden>开启每个交易日自动更新</button>
+              </div>
+              <p class="hint" id="data-schedule-hint">开启后 Windows 会在每个工作日 17:35 自动抓取行情并写入 market-data.js，不用打开本页也会更新；再点一次即可关闭。此开关需要先连上更新服务。</p>
+
+              <div class="data-token" id="data-token-box" hidden>
+                <p class="hint" id="data-token-status"></p>
+                <div class="data-token-row">
+                  <input id="data-token-input" type="password" placeholder="粘贴新的数据凭证（12 小时有效）" autocomplete="off" spellcheck="false">
+                  <button id="data-token-save" class="pill-button" type="button">保存凭证</button>
+                </div>
+              </div>
+              <p class="hint data-lan" id="data-lan" hidden></p>
+
+              <p id="data-log" class="data-log" role="status" hidden></p>
+
+              <details class="data-help">
+                <summary>没有服务时，怎么手动更新？</summary>
+                <div class="data-help-body">
+                  <p class="hint">更新按钮需要一个在后台运行的小服务，它负责调用抓取脚本。没有服务时按下面任一种方式处理，完成后刷新本页即可看到新数据。</p>
+                  <p class="data-kbd-title">方式一　启动本地更新服务（推荐，双击后一步到位）</p>
+                  <p class="hint">双击 <code>tools\启动更新服务.bat</code>：服务启动后会自动在浏览器里打开本页，之后「立即更新行情数据」随时可用。也可以在本文件夹下打开命令提示符或终端，手动执行：</p>
+                  <div class="cmd-row"><code id="data-cmd-service">python tools/update-server.py</code><button class="pill-button data-copy" type="button" data-copy="data-cmd-service">复制</button></div>
+                  <p class="data-kbd-title">方式二　只跑一次抓取脚本</p>
+                  <div class="cmd-row"><code id="data-cmd-once">python tools/fetch-market-data.py</code><button class="pill-button data-copy" type="button" data-copy="data-cmd-once">复制</button></div>
+                  <p class="hint">也可以双击 <code>tools\更新行情.bat</code>。脚本把结果写入 <code>market-data.js</code>，完成后刷新本页。</p>
+                  <p class="data-kbd-title">方式三　每个交易日自动更新</p>
+                  <p class="hint">连上服务后直接点上面的「开启每个交易日自动更新」即可，无需手动配置任务计划。手动配置步骤与接收方准备清单见随文件夹一起提供的 <code>数据更新说明.md</code>。</p>
+                </div>
+              </details>
+            </div>
+          </details>
           </div>
         </details>
 
@@ -358,63 +416,6 @@
           <p class="donate-line">测得开心？<button class="donate-link" type="button" data-donate-open>请作者喝杯咖啡 ☕</button></p>
           <p id="copy-status" class="hint" role="status"></p>
         </div>
-        <details id="data-panel" class="fold-section fold">
-          <summary class="fold-head">
-            <span class="fold-mark" aria-hidden="true">数据</span>
-            <span class="fold-text">
-              <span class="section-kicker">数据维护</span>
-              <span class="fold-title">每日行情数据更新</span>
-              <span class="fold-hint" id="data-fold-hint">正在读取本地快照……</span>
-            </span>
-            <span class="fold-chev" aria-hidden="true"></span>
-          </summary>
-          <div class="fold-body">
-            <div id="data-transport" class="data-transport" hidden></div>
-            <div class="data-status" id="data-status"></div>
-  
-            <div class="data-actions">
-              <button id="data-refresh" class="button-secondary" type="button">立即更新行情数据</button>
-              <button id="data-check" class="button-ghost" type="button">检查更新服务</button>
-            </div>
-  
-            <label class="field data-endpoint">
-              <span>更新服务地址</span>
-              <input id="data-endpoint" type="text" placeholder="例如 http://127.0.0.1:8765" autocomplete="off" spellcheck="false">
-            </label>
-            <p class="hint">留空则自动判断：网页由本机服务打开时用同一个地址，双击 HTML 打开时自动探测 http://127.0.0.1:8765，能连上按钮就直接可用。</p>
-
-            <div class="data-actions">
-              <button id="data-schedule" class="button-ghost" type="button" hidden>开启每个交易日自动更新</button>
-            </div>
-            <p class="hint" id="data-schedule-hint">开启后 Windows 会在每个工作日 17:35 自动抓取行情并写入 market-data.js，不用打开本页也会更新；再点一次即可关闭。此开关需要先连上更新服务。</p>
-
-            <div class="data-token" id="data-token-box" hidden>
-              <p class="hint" id="data-token-status"></p>
-              <div class="data-token-row">
-                <input id="data-token-input" type="password" placeholder="粘贴新的数据凭证（12 小时有效）" autocomplete="off" spellcheck="false">
-                <button id="data-token-save" class="pill-button" type="button">保存凭证</button>
-              </div>
-            </div>
-            <p class="hint data-lan" id="data-lan" hidden></p>
-  
-            <p id="data-log" class="data-log" role="status" hidden></p>
-  
-            <details class="data-help">
-              <summary>没有服务时，怎么手动更新？</summary>
-              <div class="data-help-body">
-                <p class="hint">更新按钮需要一个在后台运行的小服务，它负责调用抓取脚本。没有服务时按下面任一种方式处理，完成后刷新本页即可看到新数据。</p>
-                <p class="data-kbd-title">方式一　启动本地更新服务（推荐，双击后一步到位）</p>
-                <p class="hint">双击 <code>tools\启动更新服务.bat</code>：服务启动后会自动在浏览器里打开本页，之后「立即更新行情数据」随时可用。也可以在本文件夹下打开命令提示符或终端，手动执行：</p>
-                <div class="cmd-row"><code id="data-cmd-service">python tools/update-server.py</code><button class="pill-button data-copy" type="button" data-copy="data-cmd-service">复制</button></div>
-                <p class="data-kbd-title">方式二　只跑一次抓取脚本</p>
-                <div class="cmd-row"><code id="data-cmd-once">python tools/fetch-market-data.py</code><button class="pill-button data-copy" type="button" data-copy="data-cmd-once">复制</button></div>
-                <p class="hint">也可以双击 <code>tools\更新行情.bat</code>。脚本把结果写入 <code>market-data.js</code>，完成后刷新本页。</p>
-                <p class="data-kbd-title">方式三　每个交易日自动更新</p>
-                <p class="hint">连上服务后直接点上面的「开启每个交易日自动更新」即可，无需手动配置任务计划。手动配置步骤与接收方准备清单见随文件夹一起提供的 <code>数据更新说明.md</code>。</p>
-              </div>
-            </details>
-          </div>
-        </details>
       </section>
 
       <details id="personality-gallery" class="gallery-section">

@@ -336,9 +336,8 @@ function showResult() {
   quiz.hidden = true;
   result.hidden = false;
   quizSidebar.hidden = true;
-  // 四维偏好默认展开，其他板块由各自页面展示。
+  // 结果页上的面板默认折叠，子页面由路由打开。
   result.querySelectorAll(":scope > details").forEach(function (panel) { panel.open = false; });
-  document.querySelector("#dimension-fold").open = true;
   document.documentElement.classList.add("on-result");
   resultVersion += 1;
   generating = false;

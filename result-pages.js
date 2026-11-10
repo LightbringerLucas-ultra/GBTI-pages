@@ -50,8 +50,7 @@
       header.hidden = true;
       document.title = 'GBTI · 股票人格与每周精选';
       Object.values(sections).forEach(item => { const panel = document.getElementById(item.id); if (panel) panel.open = false; });
-      if (!result.hidden) {
-        document.getElementById('dimension-fold').open = true;
+      if (!result.hidden && document.getElementById('dimension-fold').open) {
         requestAnimationFrame(function () { if (typeof refreshRadar === 'function') refreshRadar(); });
       }
     }
