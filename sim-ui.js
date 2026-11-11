@@ -561,18 +561,84 @@
     ctx.fillText("历史指数与模拟个股走势 + 虚拟资金 · 不构成任何投资建议", 56, H - 54);
     ctx.fillText("同种子必然同结果 · seed " + report.seed, 56, H - 34);
 
-    if (c.toBlob) {
-      c.toBlob(function (blob) {
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = "GBTI-基金经理-" + report.seed + ".png";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-      }, "image/png");
+    var fileName = "GBTI-基金经理-" + report.seed + ".png";
+    if (!c.toBlob) {
+      showSheet(c.toDataURL("image/png"), fileName);
+      return;
     }
+    c.toBlob(function (blob) {
+      if (!blob) {
+        showSheet(c.toDataURL("image/png"), fileName);
+        return;
+      }
+      /* 手机上的 a[download] 基本不生效：iOS Safari 与微信内置浏览器会忽略它。
+         能调系统分享面板就分享文件，调不了就把图放大显示，让用户长按存到相册。 */
+      if (isTouchDevice() && navigator.canShare && window.File) {
+        var file = null;
+        try { file = new File([blob], fileName, { type: "image/png" }); } catch (e) { file = null; }
+        if (file && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "我的基金经理成绩单" })["catch"](function () {
+            showSheet(URL.createObjectURL(blob), fileName);
+          });
+          return;
+        }
+      }
+      if (isTouchDevice()) {
+        showSheet(URL.createObjectURL(blob), fileName);
+        return;
+      }
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    }, "image/png");
+  }
+
+  /* 触屏设备判定：a[download] 在移动端不可靠，走分享或长按保存 */
+  function isTouchDevice() {
+    var ua = navigator.userAgent || "";
+    if (/iPhone|iPad|iPod|Android|MicroMessenger|QQ\/|HarmonyOS/i.test(ua)) return true;
+    return (navigator.maxTouchPoints || 0) > 1;
+  }
+
+  /* 全屏展示生成的成绩单，提示长按保存；点关闭或背景收起 */
+  function showSheet(url, fileName) {
+    var stale = document.getElementById("sim-sheet");
+    if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+    var mask = document.createElement("div");
+    mask.id = "sim-sheet";
+    mask.setAttribute("style", "position:fixed;top:0;right:0;bottom:0;left:0;z-index:9999;" +
+      "background:rgba(20,16,12,.86);display:flex;flex-direction:column;align-items:center;" +
+      "justify-content:center;gap:12px;padding:18px;");
+    var tip = document.createElement("p");
+    tip.textContent = "长按图片保存到相册";
+    tip.setAttribute("style", "margin:0;color:#fff;font-size:13px;line-height:1.6;text-align:center;");
+    var img = document.createElement("img");
+    img.src = url;
+    img.alt = fileName;
+    img.setAttribute("style", "max-width:100%;max-height:76vh;border-radius:10px;" +
+      "box-shadow:0 16px 40px rgba(0,0,0,.42);-webkit-touch-callout:default;user-select:auto;");
+    var close = document.createElement("button");
+    close.type = "button";
+    close.textContent = "关闭";
+    close.setAttribute("style", "margin-top:2px;padding:8px 22px;border-radius:999px;" +
+      "border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:13px;");
+    function shut() {
+      if (url.indexOf("blob:") === 0) { try { URL.revokeObjectURL(url); } catch (e) { /* 忽略 */ } }
+      if (mask.parentNode) mask.parentNode.removeChild(mask);
+    }
+    close.addEventListener("click", shut);
+    mask.addEventListener("click", function (e) { if (e.target === mask) shut(); });
+    mask.appendChild(tip);
+    mask.appendChild(img);
+    mask.appendChild(close);
+    /* 弹窗是 dialog（在浏览器顶层），挂在 body 上会被它盖住，所以挂进当前打开的 dialog */
+    var host = document.querySelector("#sim-dialog[open]") || document.body;
+    host.appendChild(mask);
   }
 
   function wrap(ctx, text, maxWidth) {
