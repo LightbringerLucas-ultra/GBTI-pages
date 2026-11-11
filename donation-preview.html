@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#f5f1e8">
   <title>每份心意，都有回响 · GBTI 收款特效</title>
   <script src="donation-core.js?v=20261111-sse1" defer></script>
-  <script src="donation-effects.js?v=20261111-center1" defer></script>
-  <script src="donation-cloud.js?v=20261111-sse1" defer></script>
+  <script src="donation-effects.js?v=20261111-offline" defer></script>
+  <script src="donation-cloud.js?v=20261111-offline" defer></script>
   <style>
     :root{color-scheme:light;font-family:"Microsoft YaHei",system-ui,sans-serif;color:#272b2b;background:#f5f1e8}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 90% 5%,#e4ebe1,transparent 40%),radial-gradient(ellipse at 0% 40%,#f5dfce88,transparent 45%)}
     a{color:inherit;text-decoration:none}header{max-width:1230px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:28px 32px;border-bottom:1px solid #dedbd0}.brand{font-size:26px;font-weight:900;letter-spacing:.04em;color:#c44836}.brand small{font-weight:400;font-size:12px;color:#7a7d74;letter-spacing:0;margin-left:10px}.back{font-size:12px;color:#707568}
@@ -41,8 +41,6 @@
       function updateSound(){const enabled=api.state().soundOn;sound.setAttribute('aria-pressed',String(enabled));sound.textContent=enabled?'♪ 预览音效开启':'♪ 预览音效关闭';}
       sound.addEventListener('click',()=>{api.setSound(!api.state().soundOn);api.unlock();updateSound();});updateSound();
       window.addEventListener('gbti:donation-connection',event=>{const connected=event.detail.state==='connected',el=document.getElementById('connection'),cloud=event.detail.transport==='cloud';el.dataset.connected=String(connected);el.lastElementChild.textContent=connected?(cloud?'已连接手机收款云端':'已连接本地收款通知'):event.detail.state==='reconnecting'?'收款服务连接重试中':'特效预览模式';});
-      // The local test server explicitly enables its own same-origin stream.
-      if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)&&new URLSearchParams(location.search).get('live')==='1')api.connect('/api/receipts');
     });
   </script>
 </body>

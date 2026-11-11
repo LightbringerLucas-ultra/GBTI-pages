@@ -13,31 +13,30 @@
 </head>
 <body><main>
   <header><a href="index.html">GBTI</a><span>安卓手机 · 通知监听与联动</span></header>
-  <div class="eyebrow">从系统通知，到网页上的回响</div>
+  <div class="eyebrow">系统通知 · 本机验证</div>
   <section class="hero">
     <div class="lead">
-      <h1>收款通知，<br>能到达你的网页吗？</h1>
-      <p class="muted">手机读取支付宝到账通知，向你的 HTTPS 服务签名上报金额。无需截图、录屏或连接电脑，也保留微信和支付宝的本机诊断。</p>
+      <h1>收款通知，<br>本机验证。</h1>
+      <p class="muted">网页的云端打赏联动已停用。此处保留旧版安装包及本机通知诊断说明，不再需要设置云端地址或进行付款测试。</p>
       <a class="download" href="downloads/gbti-notification-probe-1.1.1.apk" download>下载安卓安装包 APK</a>
       <p class="meta muted">v1.1.1 · 约 41 KB · Android 8.0 及以上</p>
     </div>
     <figure class="qr"><img src="downloads/notification-probe-qr.svg" alt="用手机扫描，打开本安装页面" width="144" height="144"><figcaption>手机扫码打开此页面</figcaption></figure>
   </section>
-  <div class="panel notice"><strong>1.1.1 实测通过：支付宝 0.06 元新收款匹配网页昵称，GitHub 与课程网站均自动播放一次特效。</strong><br>首次安装默认关闭云端联动，需部署服务、登记这台手机的公钥并检查连接。本机诊断记录不上传；开启联动后仅上报匹配的支付宝新事件。</div>
+  <div class="panel notice"><strong>2026-11-11：云端打赏联动已停用。</strong><br>实时到账特效与昵称配对已暂停，网站只保留静态收款码。已配置云端的旧版 App，请先点击「停止云端联动」，再在手机系统的应用信息里执行「强行停止」，避免旧版后台上报或自动连接检查。暂时不要重新开启云端联动。</div>
   <section class="panel">
-    <h2>安装后，按这四步来</h2>
+    <h2>当前仅保留本机验证</h2>
     <ol class="steps">
-      <li><strong>安装并开启「通知使用权」</strong>用手机浏览器下载 APK，按 Android 提示安装。打开「GBTI 收款通知验证」，点第一步进入系统设置，给本工具开启通知使用权，再返回。</li>
-      <li><strong>设置云端地址与设备公钥</strong>部署收款服务后，在 App 填写自己的 HTTPS 地址。将「查看设备公钥」里的公钥登记到服务端，私钥始终留在手机；安装包中不含共享上报密钥。</li>
-      <li><strong>检查连接，再开启云端联动</strong>「检查云端连接」只验证签名，不触发特效。连接通过后开启联动，此后的匹配到账通知才会上报。更换地址会停止联动并清空待上报事件。</li>
-      <li><strong>核对真实通知与网页效果</strong>在网站点按一次以允许声音，再用另一个账号向自己的支付宝码测试愿意支付的小额。核对账单、手机上报状态和网页特效。模拟通知仅供本机诊断，永远不上报。</li>
+      <li><strong>已安装并配置过云端的手机</strong>先停止云端联动，再到系统应用信息中强行停止本工具。旧版保存的连接检查设置仍可能在重新打开时联网；停用期间不要再打开云端检查或恢复联动。</li>
+      <li><strong>首次安装用于本机诊断</strong>如确实需要检查微信或支付宝是否发送系统通知，可安装后授予通知使用权，开启 15 分钟本机验证。保持云端联动关闭，不设置云端地址。</li>
+      <li><strong>模拟通知只供本机检查</strong>可使用本工具的模拟通知检查监听权限，不需要为此再次付款，也不会触发网页特效。</li>
     </ol>
   </section>
   <section class="panel">
     <h2>两种收款，分别核对</h2>
     <div class="channels">
       <div class="channel"><h3>微信收款码</h3><span class="tag">目前仅本机诊断</span><p class="small">此前测试未观察到可用的系统到账通知，暂不启用自动广播。可开启 15 分钟本机验证，观察微信是否生成通知。</p></div>
-      <div class="channel"><h3>支付宝收款码</h3><span class="tag">已读到真实金额</span><p class="small">已适配测试机上的「你已成功收款…元」通知及「老顾客消费」后缀。手机联网并开启云端联动后才会发送新事件；不是官方支付接口。</p></div>
+      <div class="channel"><h3>支付宝收款码</h3><span class="tag">已读到真实金额</span><p class="small">已适配测试机上的「你已成功收款…元」通知及「老顾客消费」后缀。目前云端服务已停用，仅保留通知格式诊断；不是官方支付接口。</p></div>
     </div>
     <p class="checks">第一轮成功后，再测锁屏/后台收款、连续两笔同额收款。普通聊天、支出、红包或退款也需要核对是否被排除。通知事件数不等于实际到账笔数。</p>
   </section>
