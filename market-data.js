@@ -1,7 +1,7 @@
 // 由 tools/fetch-market-data.py 自动生成，请勿手工编辑。
 // 数据通道：tencent；数据来源：腾讯行情接口 qt.gtimg.cn（免密钥）
 // 行情截止：2026-11-06 收盘；抓取时间：2026-11-06T15:26:50+08:00
-const GBTI_MARKET = {
+var GBTI_MARKET = {
   "asOf": "2026-11-06",
   "fetchedAt": "2026-11-06T15:26:50+08:00",
   "source": "腾讯行情接口 qt.gtimg.cn（免密钥）",

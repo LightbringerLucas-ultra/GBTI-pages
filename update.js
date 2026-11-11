@@ -39,7 +39,10 @@
     const stored = storedEndpoint();
     if (stored) return stored.replace(/\/+$/, "");
     const host = location.hostname;
-    if (location.protocol.indexOf("http") === 0 && host && host !== "null") {
+    // 只有本机托管时，「同址」才等于「更新服务」。
+    // 线上静态站点也是 http(s)，但那里没有 /api/*，填同址必然连不上。
+    if (location.protocol.indexOf("http") === 0
+        && (host === "127.0.0.1" || host === "localhost" || host === "::1")) {
       return location.origin;
     }
     return DEFAULT_ENDPOINT;
@@ -55,6 +58,15 @@
     const host = location.hostname;
     return location.protocol.indexOf("http") === 0
       && (host === "127.0.0.1" || host === "localhost" || host === "::1");
+  }
+
+  // 线上静态站点：不是本机托管，也没有后台服务，只能靠浏览器直连行情接口。
+  function onlineMode() {
+    return location.protocol.indexOf("http") === 0 && !servedByLocalApi();
+  }
+
+  function liveReady() {
+    return onlineMode() && !!window.GBTI_LIVE && typeof window.GBTI_LIVE.run === "function";
   }
 
   /* ---------- 本地快照信息 ---------- */
@@ -198,6 +210,14 @@
       + "也可以不用服务，直接运行 python tools\\fetch-market-data.py 抓一次，然后刷新本页。";
   }
 
+  function onlineHelp(error) {
+    const head = error && error.message ? error.message + "\n\n" : "";
+    return head
+      + "当前是线上静态站点，没有后台服务，所以「更新服务」连不上是必然的，不是地址填错。\n"
+      + "点「立即更新行情数据」会改用浏览器直连行情接口（腾讯，免密钥）：\n"
+      + "约 20 秒抓完 408 只，抓到的快照存在本机浏览器里，抓完自动刷新页面。";
+  }
+
   const FILE_TIP = "当前是双击打开（file://），更新服务还没运行。\n"
     + "只需一步：回到这个文件夹，双击 tools 里的「启动更新服务.bat」。\n"
     + "服务一启动，本页会自动跳转过去，之后点「立即更新行情数据」即可。";
@@ -225,7 +245,9 @@
   }
 
   function failureHelp(error) {
-    return openedFromFile() ? FILE_TIP : unreachableHelp(error);
+    if (openedFromFile()) return FILE_TIP;
+    if (onlineMode()) return onlineHelp(error);
+    return unreachableHelp(error);
   }
 
   // file:// 下用户表达过更新意图（点了横幅或展开了面板）后，静默轮询等服务。
@@ -255,6 +277,7 @@
   function renderTransportNotice() {
     const box = $("data-transport");
     if (!box) return;
+    if (onlineMode() && !serviceUp) { renderOnlineNotice(box); return; }
     if (!openedFromFile() || serviceUp) { box.hidden = true; box.replaceChildren(); return; }
 
     box.hidden = false;
@@ -518,6 +541,65 @@
     window.setTimeout(tick, 3000);
   }
 
+  // 线上模式的面板：不再让人反复填地址，直接把「浏览器直连」这条路给出来。
+  function renderOnlineNotice(box) {
+    box.hidden = false;
+    box.replaceChildren();
+
+    const tip = document.createElement("p");
+    tip.className = "hint";
+    tip.style.whiteSpace = "pre-line";
+    tip.textContent = "当前是线上静态站点，没有后台服务，「更新服务」连不上是必然的。\n"
+      + "这里改用浏览器直连行情接口（腾讯，免密钥），抓完自动刷新本页。";
+
+    const row = document.createElement("div");
+    row.className = "data-actions";
+
+    const runButton = document.createElement("button");
+    runButton.className = "button-secondary";
+    runButton.type = "button";
+    runButton.textContent = "在线更新行情数据";
+    runButton.disabled = !liveReady();
+    runButton.addEventListener("click", function () { refreshOnline(); });
+    row.append(runButton);
+
+    const saved = window.GBTI_LIVE && window.GBTI_LIVE.stored ? window.GBTI_LIVE.stored() : null;
+    if (saved && saved.payload && saved.payload.asOf) {
+      const reset = document.createElement("button");
+      reset.className = "button-ghost";
+      reset.type = "button";
+      reset.textContent = "恢复内置快照（" + saved.payload.asOf + "）";
+      reset.addEventListener("click", function () {
+        if (window.GBTI_LIVE) window.GBTI_LIVE.clear();
+        window.location.reload();
+      });
+      row.append(reset);
+    }
+
+    box.append(tip, row);
+  }
+
+  function refreshOnline() {
+    if (busy) return;
+    if (!liveReady()) {
+      setLog("在线更新需要 live-refresh.js，页面上没加载到，刷新一次再试。", "bad");
+      return;
+    }
+    setBusy(true, "正在抓取……");
+    setLog("在线模式：浏览器直连行情接口，分 9 批抓取 408 只，大约 20 秒。", "info");
+    window.GBTI_LIVE.run({
+      onProgress: function (p) { setLog("已抓取 " + p.done + " / " + p.total + " 只……", "info"); }
+    }).then(function (result) {
+      setBusy(false);
+      setLog("更新完成。行情截止 " + result.asOf + " 收盘，覆盖 " + result.coverage
+        + "，用时约 " + Math.round(result.seconds) + " 秒。\n页面将在 2 秒后自动刷新。", "ok");
+      window.setTimeout(function () { window.location.reload(); }, 2000);
+    }).catch(function (error) {
+      setBusy(false);
+      setLog("在线更新失败：" + (error && error.message ? error.message : "未知原因"), "bad");
+    });
+  }
+
   /* ---------- 动作 ---------- */
 
   function check() {
@@ -554,6 +636,7 @@
 
   function refresh() {
     if (busy) return;
+    if (!serviceUp && liveReady()) { refreshOnline(); return; }
     setBusy(true, "正在更新……");
     setLog("已向更新服务发出请求，逐只抓取大约需要 1 至 3 分钟，请保持页面与窗口开着。", "info");
     watchRunning(false);   // 并行轮询进度，日志与横幅会实时显示第几只
