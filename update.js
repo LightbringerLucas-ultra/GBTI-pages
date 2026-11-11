@@ -699,6 +699,8 @@
 
     const input = $("data-endpoint");
     if (input) {
+      // 线上站点若把「站点同址」存成了服务地址，清掉；否则看起来像地址填错。
+      if (onlineMode() && storedEndpoint() === location.origin) saveEndpoint("");
       input.value = storedEndpoint();
       input.placeholder = "例如 " + DEFAULT_ENDPOINT;
       input.addEventListener("change", function () {
