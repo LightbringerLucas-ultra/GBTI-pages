@@ -230,15 +230,139 @@
     } catch (error) { return null; }
   }
 
+  /* ---------- 指数历史：补齐到最新交易日 ---------- */
+
+  var INDEX_KEY = "gbti-index-live-v1";
+  var KLINE_API = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get";
+
+  // index-history.js 可能以 const 声明，只在全局词法作用域里，必须裸引用。
+  function indexHistory() {
+    try {
+      if (typeof GBTI_INDEX_HISTORY !== "undefined") return GBTI_INDEX_HISTORY;
+    } catch (error) { /* 未声明就落到下面 */ }
+    return root.GBTI_INDEX_HISTORY || null;
+  }
+
+  function nextDay(dateText) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateText || "");
+    if (!m) return "";
+    var d = new Date(+m[1], +m[2] - 1, +m[3]);
+    d.setDate(d.getDate() + 1);
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+
+  // 与 tools/fetch-index-history.py 同一个接口、同一口径：只要日期与收盘。
+  function fetchIndexBars(code, from) {
+    var url = KLINE_API + "?param=" + code + ",day," + from + ",,320,qfq";
+    return fetch(url, { cache: "no-store", credentials: "omit" })
+      .then(function (response) {
+        if (!response.ok) throw new Error("指数接口返回 HTTP " + response.status);
+        return response.json();
+      })
+      .then(function (json) {
+        var pack = json && json.data && json.data[code];
+        var rows = pack && (pack.qfqday || pack.day);
+        if (!rows || !rows.length) throw new Error(code + " 没有返回日线，可能被网络拦住了");
+        var out = [];
+        rows.forEach(function (row) {
+          var date = String((row && row[0]) || "");
+          var close = num(row && row[2]);
+          if (/^\d{4}-\d{2}-\d{2}$/.test(date) && close !== null) out.push([date, close]);
+        });
+        return out;
+      });
+  }
+
+  function runIndex(options) {
+    var history = indexHistory();
+    if (!history || !history.series) {
+      return Promise.reject(new Error("没读到指数历史快照（index-history.js），无法补齐回测数据。"));
+    }
+    var codes = Object.keys(history.series);
+    if (!codes.length) {
+      return Promise.reject(new Error("指数历史里没有可补齐的曲线。"));
+    }
+    var started = Date.now();
+    var patches = {};
+    var latest = "";
+
+    var chain = Promise.resolve();
+    codes.forEach(function (code) {
+      chain = chain.then(function () {
+        var series = history.series[code] || {};
+        var points = series.points || [];
+        var last = series.last || (points.length ? points[points.length - 1][0] : "");
+        if (!last) throw new Error(code + " 没有内置历史，确定不了补齐起点");
+        return fetchIndexBars(code, nextDay(last)).then(function (rows) {
+          var fresh = rows.filter(function (point) { return point[0] > last; });
+          if (!fresh.length) return;
+          patches[code] = fresh;
+          var tail = fresh[fresh.length - 1][0];
+          if (tail > latest) latest = tail;
+        });
+      });
+    });
+
+    return chain.then(function () {
+      if (!latest) {
+        return { asOf: history.asOf, added: 0, codes: 0, seconds: (Date.now() - started) / 1000 };
+      }
+      var total = 0;
+      Object.keys(patches).forEach(function (code) { total += patches[code].length; });
+      var payload = {
+        asOf: latest,
+        fetchedAt: localStamp(),
+        source: KLINE_API,
+        patches: patches
+      };
+      try {
+        localStorage.setItem(INDEX_KEY, JSON.stringify(payload));
+      } catch (error) {
+        throw new Error("浏览器本地存储写入失败（可能空间不足或禁用了存储）。");
+      }
+      return {
+        asOf: latest,
+        added: total,
+        codes: Object.keys(patches).length,
+        seconds: (Date.now() - started) / 1000
+      };
+    });
+  }
+
+  function storedIndex() {
+    try {
+      var raw = localStorage.getItem(INDEX_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) { return null; }
+  }
+
+  function clearIndex() {
+    try { localStorage.removeItem(INDEX_KEY); return true; } catch (error) { return false; }
+  }
+
+  function builtinAsOf() {
+    var market = typeof GBTI_MARKET !== "undefined" ? GBTI_MARKET : root.GBTI_MARKET;
+    var stock = market && market.asOf ? market.asOf : "";
+    var history = indexHistory();
+    var index = history && history.asOf ? history.asOf : "";
+    return { stock: stock, index: index };
+  }
+
   function clear() {
     try { localStorage.removeItem(STORE_KEY); return true; } catch (error) { return false; }
   }
 
   root.GBTI_LIVE = {
     run: run,
+    runIndex: runIndex,
     stored: stored,
+    storedIndex: storedIndex,
     clear: clear,
+    clearIndex: clearIndex,
     storeKey: STORE_KEY,
+    indexStoreKey: INDEX_KEY,
+    builtinAsOf: builtinAsOf,
+    indexHistory: indexHistory,
     poolCodes: poolCodes,
     symbolOf: symbolOf,
     recordOf: recordOf

@@ -550,7 +550,7 @@
     tip.className = "hint";
     tip.style.whiteSpace = "pre-line";
     tip.textContent = "当前是线上静态站点，没有后台服务，「更新服务」连不上是必然的。\n"
-      + "这里改用浏览器直连行情接口（腾讯，免密钥），抓完自动刷新本页。";
+      + "这里改用浏览器直连行情接口（腾讯，免密钥），一次把个股快照和历史回测的指数日线都拉到最新，抓完自动刷新本页。";
 
     const row = document.createElement("div");
     row.className = "data-actions";
@@ -564,19 +564,40 @@
     row.append(runButton);
 
     const saved = window.GBTI_LIVE && window.GBTI_LIVE.stored ? window.GBTI_LIVE.stored() : null;
-    if (saved && saved.payload && saved.payload.asOf) {
+    const savedIndex = window.GBTI_LIVE && window.GBTI_LIVE.storedIndex
+      ? window.GBTI_LIVE.storedIndex() : null;
+    const savedAsOf = (saved && saved.payload && saved.payload.asOf)
+      || (savedIndex && savedIndex.asOf) || "";
+    if (savedAsOf) {
       const reset = document.createElement("button");
       reset.className = "button-ghost";
       reset.type = "button";
-      reset.textContent = "恢复内置快照（" + saved.payload.asOf + "）";
+      reset.textContent = "清除本浏览器的新数据（当前 " + savedAsOf + "）";
       reset.addEventListener("click", function () {
-        if (window.GBTI_LIVE) window.GBTI_LIVE.clear();
+        if (window.GBTI_LIVE) {
+          if (window.GBTI_LIVE.clear) window.GBTI_LIVE.clear();
+          if (window.GBTI_LIVE.clearIndex) window.GBTI_LIVE.clearIndex();
+        }
         window.location.reload();
       });
       row.append(reset);
     }
 
     box.append(tip, row);
+  }
+
+  // 首页不加载 190KB 的指数历史，点更新时按需拉一次再补。
+  function ensureIndexHistory() {
+    if (typeof GBTI_INDEX_HISTORY !== "undefined" || window.GBTI_INDEX_HISTORY) {
+      return Promise.resolve(true);
+    }
+    return new Promise(function (resolve) {
+      const script = document.createElement("script");
+      script.src = "index-history.js?v=20261111-sync";
+      script.onload = function () { resolve(true); };
+      script.onerror = function () { resolve(false); };
+      document.head.appendChild(script);
+    });
   }
 
   function refreshOnline() {
@@ -586,13 +607,48 @@
       return;
     }
     setBusy(true, "正在抓取……");
-    setLog("在线模式：浏览器直连行情接口，分 9 批抓取 408 只，大约 20 秒。", "info");
+    setLog("在线模式：浏览器直连行情接口。先抓 408 只个股（分 9 批，约 20 秒），"
+      + "再补历史回测用的指数日线（约 1 秒），两步都完成才刷新页面。", "info");
+
+    var stockResult = null;
+    var indexResult = null;
+    var indexError = null;
+
     window.GBTI_LIVE.run({
       onProgress: function (p) { setLog("已抓取 " + p.done + " / " + p.total + " 只……", "info"); }
     }).then(function (result) {
+      stockResult = result;
+      setLog("个股快照已更新到 " + result.asOf + "，正在补历史回测的指数日线……", "info");
+      return ensureIndexHistory();
+    }).then(function (ready) {
+      if (!ready) {
+        indexError = new Error("指数历史脚本没加载上");
+        return null;
+      }
+      if (typeof window.GBTI_LIVE.runIndex !== "function") return null;
+      return window.GBTI_LIVE.runIndex().catch(function (error) {
+        indexError = error;
+        return null;
+      });
+    }).then(function (result) {
+      indexResult = result;
       setBusy(false);
-      setLog("更新完成。行情截止 " + result.asOf + " 收盘，覆盖 " + result.coverage
-        + "，用时约 " + Math.round(result.seconds) + " 秒。\n页面将在 2 秒后自动刷新。", "ok");
+
+      var lines = [
+        "个股快照：行情截止 " + stockResult.asOf + "，覆盖 " + stockResult.coverage
+          + "，用时约 " + Math.round(stockResult.seconds) + " 秒。"
+      ];
+      if (indexResult) {
+        lines.push(indexResult.added
+          ? "历史回测：指数日线已补至 " + indexResult.asOf + "，新增 " + indexResult.added
+            + " 个交易日，涉及 " + indexResult.codes + " 条曲线。"
+          : "历史回测：指数日线本来就是最新（" + indexResult.asOf + "），无需补齐。");
+      } else if (indexError) {
+        lines.push("历史回测：指数日线没补上（" + (indexError.message || "网络原因")
+          + "），个股数据不受影响。");
+      }
+      lines.push("页面将在 2 秒后自动刷新。");
+      setLog(lines.join("\n"), indexError ? "bad" : "ok");
       window.setTimeout(function () { window.location.reload(); }, 2000);
     }).catch(function (error) {
       setBusy(false);
