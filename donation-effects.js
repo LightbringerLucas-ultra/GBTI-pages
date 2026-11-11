@@ -112,14 +112,14 @@
       :host{font-family:"Microsoft YaHei",system-ui,sans-serif;color:#fff;line-height:1.5}
       *{box-sizing:border-box} .stage{position:absolute;inset:0;overflow:hidden;pointer-events:none}
       canvas{position:absolute;inset:0;width:100%;height:100%}
-      .veil{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 50% 42%,#133b4188,transparent 65%);transition:opacity .55s}
+      .veil{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 50% 50%,#133b4188,transparent 65%);transition:opacity .55s}
       .stage[data-tier=meteor] .veil{background:radial-gradient(ellipse at 50% 45%,#30204eaa,#11132944 70%)}
       .stage[data-tier=nova] .veil{background:radial-gradient(ellipse at 50% 40%,#203957e8,#111826d9 65%,#121929e8)}
       .stage.active .veil{opacity:1}.stage.leaving{opacity:0;transition:opacity .45s}
       .card{position:absolute;left:50%;top:53%;width:min(430px,calc(100vw - 32px));transform:translate(-50%,-40%) scale(.88);opacity:0;text-align:center;padding:25px 28px 18px;border-radius:26px;border:1px solid #ffffff38;background:linear-gradient(135deg,#172c35ee,#203444df);backdrop-filter:blur(22px);box-shadow:0 18px 65px #0004;transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .4s}
       .active .card{opacity:1;transform:translate(-50%,-50%) scale(1)}
-      [data-tier=spark] .card{top:auto;bottom:max(34px,env(safe-area-inset-bottom));transform:translate(-50%,20px) scale(.92);width:min(390px,calc(100vw - 32px));background:linear-gradient(135deg,#163d36f2,#183233f5);border-color:#9dffe653}
-      [data-tier=spark].active .card{transform:translate(-50%,0) scale(1)}
+      [data-tier=spark] .card{top:50%;transform:translate(-50%,-40%) scale(.92);width:min(390px,calc(100vw - 32px));background:linear-gradient(135deg,#163d36f2,#183233f5);border-color:#9dffe653}
+      [data-tier=spark].active .card{transform:translate(-50%,-50%) scale(1)}
       [data-tier=meteor] .card{background:linear-gradient(135deg,#322546ed,#282b48ed);border-color:#d6b7ff66}
       [data-tier=nova] .card{top:64%;border-color:#ffdca56e;background:linear-gradient(135deg,#283446e8,#1e2939ef);box-shadow:0 15px 90px #e6b86922}
       .eyebrow{margin:0 0 5px;font-size:10px;letter-spacing:.22em;color:var(--accent)}
@@ -170,7 +170,7 @@
     stars=Array.from({length:tier==='nova'?100:50},(_,i)=>({x:Math.random(),y:Math.random(),size:.5+Math.random()*1.5,phase:i*.7}));
   }
   function drawSpark(t) {
-    const originY=height-Math.min(200,height*.25), fade=clamp((3.4-t)/.8);
+    const originY=height*.5, fade=clamp((3.4-t)/.8);
     particles.forEach(p=>{
       const age=t-p.delay;if(age<0)return;
       const progress=clamp(age/2.5), distance=ease(progress)*(85+p.radius*Math.min(width*.45,300));

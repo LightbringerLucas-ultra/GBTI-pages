@@ -18,12 +18,12 @@
     <div class="lead">
       <h1>收款通知，<br>能到达你的网页吗？</h1>
       <p class="muted">手机读取支付宝到账通知，向你的 HTTPS 服务签名上报金额。无需截图、录屏或连接电脑，也保留微信和支付宝的本机诊断。</p>
-      <a class="download" href="downloads/gbti-notification-probe-1.1.0.apk" download>下载安卓安装包 APK</a>
-      <p class="meta muted">v1.1.0 · 约 41 KB · Android 8.0 及以上</p>
+      <a class="download" href="downloads/gbti-notification-probe-1.1.1.apk" download>下载安卓安装包 APK</a>
+      <p class="meta muted">v1.1.1 · 约 41 KB · Android 8.0 及以上</p>
     </div>
     <figure class="qr"><img src="downloads/notification-probe-qr.svg" alt="用手机扫描，打开本安装页面" width="144" height="144"><figcaption>手机扫码打开此页面</figcaption></figure>
   </section>
-  <div class="panel notice"><strong>实测通过：支付宝 0.01 元新收款由手机直接上报，两个独立访客页面均自动播放特效。</strong><br>首次安装默认关闭云端联动，需部署服务、登记这台手机的公钥并检查连接。本机诊断记录不上传；开启联动后仅上报匹配的支付宝新事件。</div>
+  <div class="panel notice"><strong>1.1.1 实测通过：支付宝 0.06 元新收款匹配网页昵称，GitHub 与课程网站均自动播放一次特效。</strong><br>首次安装默认关闭云端联动，需部署服务、登记这台手机的公钥并检查连接。本机诊断记录不上传；开启联动后仅上报匹配的支付宝新事件。</div>
   <section class="panel">
     <h2>安装后，按这四步来</h2>
     <ol class="steps">
@@ -37,7 +37,7 @@
     <h2>两种收款，分别核对</h2>
     <div class="channels">
       <div class="channel"><h3>微信收款码</h3><span class="tag">目前仅本机诊断</span><p class="small">此前测试未观察到可用的系统到账通知，暂不启用自动广播。可开启 15 分钟本机验证，观察微信是否生成通知。</p></div>
-      <div class="channel"><h3>支付宝收款码</h3><span class="tag">已读到真实金额</span><p class="small">已适配测试机上的「你已成功收款…元」通知。手机联网并开启云端联动后才会发送新事件；不是官方支付接口。</p></div>
+      <div class="channel"><h3>支付宝收款码</h3><span class="tag">已读到真实金额</span><p class="small">已适配测试机上的「你已成功收款…元」通知及「老顾客消费」后缀。手机联网并开启云端联动后才会发送新事件；不是官方支付接口。</p></div>
     </div>
     <p class="checks">第一轮成功后，再测锁屏/后台收款、连续两笔同额收款。普通聊天、支出、红包或退款也需要核对是否被排除。通知事件数不等于实际到账笔数。</p>
   </section>
@@ -46,8 +46,8 @@
     <p class="small">先看「通知使用权：已授权」「监听服务：已连接」。如未连接，点「重新连接监听服务」。必要时按手机设置允许本工具后台运行，并确认微信和支付宝开启到账通知。</p>
     <p class="small muted">ColorOS 菜单会随系统版本变化。如果出现「受限设置」，使用应用详情内系统提供的入口处理，不关闭系统安全防护。通知正文被隐藏、分身或工作空间不可见，都请保留为测试结果。</p>
     <details><summary>隐私、权限与验证范围</summary><p>通知使用权是 Android 的特殊授权，系统授权范围较广。本工具先按来源筛选，只处理微信、支付宝和自己的模拟通知。最多在本机保留 100 条诊断元数据与候选金额，不保存原始通知正文、付款人姓名或交易编号。</p><p>联网权限用于 HTTPS 上报及网络重试，没有相机、录屏、联系人或无障碍权限。发送通知权限仅用于模拟测试。开启云端联动后，只发送金额、匿名事件标识和时间；你可以随时停止联动或撤销通知使用权。</p><p>到账通知可能被合并、隐藏或误识别，不能代替支付平台确认。个人收款码的通知不能单独证明付款来自本网站；同一未移除通知的更新不会重复广播，合并多笔通知时可能漏报。</p></details>
-    <details><summary>安装包校验与已完成检查</summary><p>包名：<code>app.gbti.receiptprobe</code>。APK 签名与权限检查、46 项规则及地址断言通过。已在 OPPO 手机上通过生产 HTTPS 签名检查，并实测一笔支付宝 0.01 元通知经云端触发两个独立访客页面。其他档位通过本地规则与动画测试。</p><p>SHA-256：<br><code>32318201753f7b5bf76b309d39d6cd061392761558516260b79edd66b58f3191</code></p><a href="downloads/gbti-notification-probe-1.1.0.apk.sha256">下载校验值</a></details>
+    <details><summary>安装包校验与已完成检查</summary><p>包名：<code>app.gbti.receiptprobe</code>。APK 签名与权限检查、64 项规则、时效及地址断言通过。已在 OPPO 手机上通过生产 HTTPS 签名检查，并在 1.1.1 上复测一笔支付宝 0.06 元通知，经云端匹配昵称后触发 GitHub 与课程网站各一次特效。另收到 0.18 元和 1.16 元通知，三档特效均已在线上触发。</p><p>SHA-256：<br><code>b5d9b798aa7a125f4975c14a5d9e41d048ec83ea401e3ba7e318ddfe2d4e322e</code></p><a href="downloads/gbti-notification-probe-1.1.1.apk.sha256">下载校验值</a></details>
   </section>
-  <p class="footer">GBTI · 通知监听与联动 1.1.0 · 2026-11-10<br>技术依据：<a href="https://developer.android.com/reference/android/service/notification/NotificationListenerService" target="_blank" rel="noopener noreferrer">Android 通知监听服务</a></p>
+  <p class="footer">GBTI · 通知监听与联动 1.1.1 · 2026-11-11<br>技术依据：<a href="https://developer.android.com/reference/android/service/notification/NotificationListenerService" target="_blank" rel="noopener noreferrer">Android 通知监听服务</a></p>
 </main></body>
 </html>
